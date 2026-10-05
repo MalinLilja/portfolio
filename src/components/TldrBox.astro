@@ -1,0 +1,50 @@
+---
+import { hideGaps } from '../lib/brackets';
+
+interface Props {
+  company: string;
+  role: string;
+  timeline?: string;
+  team?: string;
+  problem: string;
+  whatIDid: string;
+  result?: string;
+}
+
+const p = Astro.props;
+// Fields that are still [gaps] are left out.
+const visible = (pairs: [string, string | undefined][]) =>
+  pairs.map(([label, value]) => [label, hideGaps(value)] as const).filter(([, value]) => value);
+const facts = visible([
+  ['Company', p.company],
+  ['Role', p.role],
+  ['Timeline', p.timeline],
+  ['Team', p.team],
+]);
+const story = visible([
+  ['Problem', p.problem],
+  ['What I did', p.whatIDid],
+  ['Result', p.result],
+]);
+---
+
+<section
+  class="rounded-card border border-t-4 border-border border-t-case-accent bg-surface p-6 md:p-8"
+  aria-labelledby="tldr-heading"
+>
+  <h2 id="tldr-heading" class="eyebrow">TL;DR</h2>
+  <div class="mt-4 grid gap-6 lg:grid-cols-[1fr_2fr] lg:gap-12">
+    {
+      [facts, story].map((list) => (
+        <dl class="grid content-start gap-4">
+          {list.map(([label, value]) => (
+            <div>
+              <dt class="font-display text-14 font-semibold text-case-accent-strong">{label}</dt>
+              <dd class="mt-1">{value}</dd>
+            </div>
+          ))}
+        </dl>
+      ))
+    }
+  </div>
+</section>

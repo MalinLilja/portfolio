@@ -1,0 +1,34 @@
+---
+interface Props {
+  href: string;
+  /** Opens the file download instead of navigating */
+  download?: boolean;
+  variant?: 'solid' | 'outline';
+}
+
+const { href, download = false, variant = 'outline' } = Astro.props;
+const external = /^https?:\/\//.test(href);
+---
+
+<a
+  class:list={[
+    'inline-flex min-h-11 items-center gap-2 rounded-pill border-2 px-6 py-2 font-display text-14 font-semibold no-underline transition-colors duration-160 ease-out',
+    variant === 'solid'
+      ? 'border-accent bg-accent text-on-accent hover:bg-focus'
+      : 'border-case-accent-strong text-text hover:bg-surface-raised',
+  ]}
+  href={href}
+  download={download ? '' : undefined}
+  rel={external ? 'noopener' : undefined}
+>
+  <slot />
+  {
+    external && (
+      <>
+        <span aria-hidden="true">↗</span>
+        <span class="sr-only">(external site)</span>
+      </>
+    )
+  }
+  {download && <span aria-hidden="true">↓</span>}
+</a>

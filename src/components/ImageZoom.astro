@@ -1,0 +1,56 @@
+---
+// Tap or click a case study image to see it full size. Images fade in as they load.
+---
+
+<dialog
+  class="zoom m-0 h-dvh max-h-none w-screen max-w-none border-0 bg-overlay px-4 pt-12 pb-4 text-overlay-text backdrop:bg-transparent open:grid open:place-items-center"
+  aria-label="Enlarged image"
+>
+  <form method="dialog">
+    <button
+      class="fixed top-3 right-3 inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-pill border border-overlay-border bg-overlay-control px-4 py-2 focus-visible:outline-overlay-text"
+      type="submit">Close <span aria-hidden="true">×</span></button
+    >
+  </form>
+  <img alt="" class="max-h-[calc(100dvh-4rem)] w-auto max-w-full cursor-zoom-out rounded-card object-contain" />
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('dialog.zoom');
+  const big = dialog?.querySelector('img');
+  const images = document.querySelectorAll<HTMLImageElement>('[data-zoomable], .prose .figure img');
+
+  // Largest candidate in the srcset, so the enlarged view is sharp.
+  const largest = (img: HTMLImageElement) => {
+    const candidates = (img.getAttribute('srcset') ?? '')
+      .split(',')
+      .map((s) => s.trim().split(/\s+/))
+      .filter(([url]) => url)
+      .map(([url, w]) => ({ url, w: parseInt(w) || 0 }));
+    candidates.sort((a, b) => b.w - a.w);
+    return candidates[0]?.url ?? img.currentSrc ?? img.src;
+  };
+
+  images.forEach((img) => {
+    const markLoaded = () => img.classList.add('is-loaded');
+    if (img.complete) markLoaded();
+    else img.addEventListener('load', markLoaded, { once: true });
+
+    if (!dialog || !big) return;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'block w-full cursor-zoom-in rounded-media';
+    button.setAttribute('aria-label', `Enlarge image: ${img.alt}`);
+    img.replaceWith(button);
+    button.append(img);
+    button.addEventListener('click', () => {
+      big.src = largest(img);
+      big.alt = img.alt;
+      dialog.showModal();
+    });
+  });
+
+  dialog?.addEventListener('click', (e) => {
+    if (e.target === dialog || e.target === big) dialog.close();
+  });
+</script>

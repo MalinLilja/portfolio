@@ -1,0 +1,182 @@
+/*
+  Design tokens = Tailwind theme. The root colours are the cream default theme;
+  [data-theme] and [data-case] blocks below override them per page.
+ Names mirror the Figma variables, and each
+  token becomes a Tailwind class:
+
+    color/surface      --color-surface      bg-surface, text-surface, border-surface
+    color/text-muted   --color-text-muted   text-text-muted
+    radius/card        --radius-card        rounded-card
+    font/display       --font-display       font-display
+    text/22            --text-22            text-22
+    container/reading  --container-reading  max-w-reading
+
+  Space: Tailwind's 4 px grid. The class number is px ÷ 4, so Figma space/16 → p-4,
+  space/24 → gap-6, space/48 → mt-12. In CSS: --spacing(4).
+
+  Breakpoints: md = 720px, lg = 1080px (sm = 480px for small tweaks).
+
+  The default Tailwind palette and type scale are switched off, so only these
+  tokens can be used.
+*/
+
+@theme {
+  --color-*: initial;
+  --text-*: initial;
+  --breakpoint-*: initial;
+
+  /* Colour – site default: cream editorial (home, about, 404) */
+  --color-bg: #fdf7d3;
+  --color-surface: #fffbe8;
+  --color-surface-raised: #fffdf3;
+  --color-border: #ddd3a2;
+  --color-text: #08070a;
+  --color-text-muted: #55513a;
+  --color-accent: #5a48c4;
+  --color-on-accent: #fdf7d3;
+  --color-focus: #5a48c4;
+  --color-stars: #8a8566;
+
+  /* Brand palette from the colour scheme video */
+  --color-cream: #fdf7d3;
+  --color-ink: #08070a;
+  --color-on-ink: #fdf7d3;
+  --color-on-ink-muted: #c9c3a3;
+  --color-violet: #6d5ccf;
+  --color-olive: #87922d;
+  --color-olive-strong: #5d6619;
+  --color-glow: #eda4df;
+
+  /* Gradient card (blue → lavender) and the text that sits on it.
+     The scrim darkens the image so cream text keeps 3:1 or more. */
+  --color-gradient-start: #6f8ff0;
+  --color-gradient-end: #c4b7ff;
+  --color-gradient-scrim: rgb(40 30 120 / 0.35);
+  --color-on-gradient: #fbf9e6;
+
+  /* Image zoom overlay (same on every page) */
+  --color-overlay: rgb(8 8 12 / 0.94);
+  --color-overlay-text: #f3f2f8;
+  --color-overlay-border: rgb(255 255 255 / 0.3);
+  --color-overlay-control: rgb(0 0 0 / 0.5);
+
+  /* Per-case accent (overridden by [data-case] below)
+     case-accent: decorative (bars, markers, borders)
+     case-accent-strong: text-safe (AA 4.5:1 on that page's background) */
+  --color-case-accent: var(--color-violet);
+  --color-case-accent-strong: var(--color-accent);
+
+  /* Type */
+  --font-display: "Unbounded Variable", "Arial Black", system-ui, sans-serif;
+  --font-body: "Ubuntu Sans Variable", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, "Cascadia Mono", monospace;
+  --text-13: 0.8125rem;
+  --text-14: 0.875rem;
+  --text-17: 1.0625rem;
+  --text-18: 1.125rem;
+  --text-22: 1.375rem;
+  --text-32: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+  --text-48: clamp(2rem, 1.4rem + 2.4vw, 3rem);
+  --text-72: clamp(2.5rem, 1.6rem + 3.6vw, 4.5rem);
+  --leading-body: 1.6;
+  --leading-tight: 1.15;
+
+  /* Radius */
+  --radius-card: 8px;
+  --radius-thumb: 6px;
+  --radius-media: 16px;
+  --radius-pill: 999px;
+
+  /* Layout */
+  --container-content: 1200px;
+  --container-reading: 680px;
+  --container-figure: 1000px;
+  --breakpoint-sm: 480px;
+  --breakpoint-md: 720px;
+  --breakpoint-lg: 1080px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  /* The gradient card's slow flow (switched off for reduced motion) */
+  --animate-drift: drift 24s ease-in-out infinite alternate;
+  @keyframes drift {
+    from { background-position: 0% 30%, 0% 30%; }
+    to { background-position: 0% 30%, 100% 70%; }
+  }
+}
+
+:root {
+  --gutter: clamp(--spacing(4), 4vw, --spacing(12));
+  --header-height: 4.25rem;
+  color-scheme: light;
+}
+
+/* Dark pages (SmartOpt, Ziklo): the previous site default */
+[data-theme="dark"] {
+  --color-bg: #0e0e14;
+  --color-surface: #18181f;
+  --color-surface-raised: #22222c;
+  --color-border: #2f2e3b;
+  --color-text: #f3f2f8;
+  --color-text-muted: #b3b1c4;
+  --color-accent: #b9b1ff;
+  --color-on-accent: #13112a;
+  --color-focus: #d9d4ff;
+  --color-case-accent: #b9b1ff;
+  --color-case-accent-strong: #b9b1ff;
+  --color-stars: var(--color-case-accent);
+  color-scheme: dark;
+}
+
+/* Light pages (Qmatic, Länsförsäkringar) */
+[data-theme="light"] {
+  --color-bg: #f2f3f7;
+  --color-surface: #ffffff;
+  --color-surface-raised: #ffffff;
+  --color-border: #d5d8e1;
+  --color-text: #15151d;
+  --color-text-muted: #4b4b5c;
+  --color-accent: #4b3fc4;
+  --color-on-accent: #ffffff;
+  --color-focus: #4b3fc4;
+  --color-case-accent: #4b3fc4;
+  --color-case-accent-strong: #4b3fc4;
+  --color-stars: var(--color-case-accent);
+  color-scheme: light;
+}
+
+/* Per-case brand colours */
+[data-case="smartopt"] {
+  --color-bg: #151b2b;
+  --color-surface: #1e2639;
+  --color-surface-raised: #273149;
+  --color-border: #34405c;
+  --color-case-accent: #4ee0b0;
+  --color-case-accent-strong: #4ee0b0;
+}
+
+[data-case="ziklo"] {
+  --color-bg: #12161c;
+  --color-surface: #1b2129;
+  --color-surface-raised: #242c36;
+  --color-border: #313b48;
+  --color-case-accent: #7fd88a;
+  --color-case-accent-strong: #7fd88a;
+}
+
+[data-case="qmatic"] {
+  --color-bg: #f1f3f5;
+  --color-case-accent: #5ac21e;
+  --color-case-accent-strong: #2e6e0a;
+}
+
+[data-case="lansforsakringar"] {
+  --color-bg: #d7e9f7;
+  --color-surface: #f4f9fd;
+  --color-surface-raised: #ffffff;
+  --color-border: #b3cfe6;
+  --color-text-muted: #34495c;
+  --color-case-accent: #005aa0;
+  --color-case-accent-strong: #004f8c;
+}

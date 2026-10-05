@@ -1,0 +1,120 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import { Image, getImage } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import WorkCard from '../components/WorkCard.astro';
+import ExperienceStrip from '../components/ExperienceStrip.astro';
+import Quote from '../components/Quote.astro';
+import StarDivider from '../components/StarDivider.astro';
+import SplitBar from '../components/SplitBar.astro';
+import Starburst from '../components/Starburst.astro';
+import portrait from '../assets/site/portrait.jpg';
+import gradient from '../assets/site/gradient.jpg';
+
+const profile = (await getEntry('site', 'profile'))!.data;
+const home = (await getEntry('site', 'home'))!;
+const { Content: Intro } = await render(home);
+const cases = (await getCollection('work')).sort((a, b) => a.data.order - b.data.order);
+// Experience rows link to their published case studies
+const experience = (home.data.experience ?? []).map((item) => ({
+  ...item,
+  links: (item.work ?? []).flatMap((slug) => {
+    const c = cases.find((entry) => entry.id === slug);
+    return c ? [{ label: c.data.client, href: `/work/${c.id}` }] : [];
+  }),
+}));
+const panel = await getImage({ src: gradient, width: 1200, format: 'webp', quality: 60 });
+// Scrim + flowing gradient image (see --animate-drift in tokens.css)
+const cardBackground = `background-image: linear-gradient(var(--color-gradient-scrim), var(--color-gradient-scrim)), url(${panel.src}), linear-gradient(160deg, var(--color-gradient-start), var(--color-gradient-end)); background-size: auto, 180% auto, auto; background-position: 0% 30%, 0% 30%, 0 0;`;
+---
+
+<Base
+  title="Malin Lilja – UX designer in Göteborg | Senior UX & Product Designer"
+  description={home.data.description!}
+  ogType="profile"
+>
+  <div class="container-page pt-8 lg:pt-12">
+    <div class="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-start lg:gap-16">
+      <!-- Collage: gradient card with the name, black panel with the positioning line overlapping it -->
+      <section aria-labelledby="positioning">
+        <div
+          class="relative border-2 border-glow p-5 pb-20 shadow-[0_0_28px_var(--color-glow)] animate-drift motion-reduce:animate-none md:p-12 md:pb-24"
+          style={cardBackground}
+        >
+          <div class="flex items-center gap-5 md:gap-8">
+            <Image
+              class="size-24 shrink-0 rounded-card object-cover md:size-40"
+              src={portrait}
+              alt="Portrait of Malin Lilja, outdoors by a rocky coast."
+              width={160}
+              height={160}
+              layout="fixed"
+              loading="eager"
+              fetchpriority="high"
+            />
+            <div class="min-w-0 grow">
+              <SplitBar class="mb-3 max-w-md md:mb-4" />
+              <p
+                class="font-display text-[clamp(2.25rem,1.2rem+4.4vw,4.75rem)] leading-[0.95] font-bold text-on-gradient uppercase"
+              >
+                {profile.name.split(' ').map((part) => <span class="block">{part}</span>)}
+              </p>
+            </div>
+            <Starburst class="absolute -top-5 -right-2 size-14 rotate-12 md:-top-7 md:-right-7 md:size-20" />
+          </div>
+          <div
+            class="mt-5 h-2 md:mt-6"
+            style="background: radial-gradient(circle, var(--color-on-gradient) 2.5px, transparent 3px) left center / 20px 8px repeat-x"
+            aria-hidden="true"
+          >
+          </div>
+          <p class="mt-5 font-mono text-14 tracking-[0.08em] text-ink uppercase md:mt-8">
+            {profile.title} · {profile.city}
+          </p>
+        </div>
+
+        <div class="relative z-10 -mt-14 ml-4 bg-ink p-6 text-on-ink md:-mt-20 md:ml-12 md:p-12 lg:-mr-8">
+          <h1 id="positioning" class="text-32 leading-[1.2]">{home.data.positioning}</h1>
+          <div class="mt-6 text-on-ink-muted [&_p:first-child]:text-18 [&_p:first-child]:text-on-ink [&_p+p]:mt-4">
+            <Intro />
+          </div>
+          <SplitBar class="mt-8 ml-auto w-56" />
+        </div>
+      </section>
+
+      <section id="work" aria-labelledby="work-heading">
+        <h2 id="work-heading" class="eyebrow">Selected work</h2>
+        <ul class="mt-4 grid grid-cols-1 gap-3">
+          {
+            home.data.comingSoon?.map((c) => (
+              <li>
+                <WorkCard client={c.client} summary={c.summary} note={c.note} />
+              </li>
+            ))
+          }
+          {
+            cases.map((c) => (
+              <li>
+                <WorkCard
+                  client={c.data.client}
+                  summary={c.data.summary}
+                  tags={c.data.tags.filter((t) => !t.startsWith('via ')).slice(0, 3)}
+                  href={`/work/${c.id}`}
+                  image={c.data.hero}
+                  accent={c.data.accent}
+                />
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+
+    <StarDivider large class="mt-16" />
+
+    <div class="mt-16 grid gap-16 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-16">
+      <ExperienceStrip items={experience} />
+      {home.data.quote && <Quote {...home.data.quote} />}
+    </div>
+  </div>
+</Base>

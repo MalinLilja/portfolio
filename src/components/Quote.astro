@@ -1,0 +1,19 @@
+---
+interface Props {
+  text: string;
+  name: string;
+  title: string;
+}
+
+const { text, name, title } = Astro.props;
+---
+
+<figure class="max-w-[880px]">
+  <blockquote>
+    <p class="font-display text-32 leading-[1.3] font-light text-balance">“{text}”</p>
+  </blockquote>
+  <figcaption class="mt-6 flex flex-wrap gap-x-3 gap-y-1">
+    <span class="font-semibold">{name}</span>
+    <span class="text-text-muted">{title}</span>
+  </figcaption>
+</figure>

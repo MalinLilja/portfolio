@@ -1,0 +1,83 @@
+---
+import { getEntry } from 'astro:content';
+
+const profile = (await getEntry('site', 'profile'))!.data;
+const path = Astro.url.pathname;
+const links = [
+  { href: '/#work', label: 'Work', current: path.startsWith('/work') },
+  { href: '/about', label: 'About', current: path.startsWith('/about') },
+  { href: '/malin-lilja-cv.pdf', label: 'CV (PDF)', download: true },
+  { href: `mailto:${profile.email}`, label: 'Email' },
+];
+---
+
+<header
+  class="sticky top-0 z-50 border-b border-border bg-bg/88 backdrop-blur-md print:hidden"
+>
+  <div
+    class="container-page relative flex min-h-(--header-height) flex-wrap items-center justify-between gap-6 md:flex-nowrap"
+  >
+    <a class="flex flex-col leading-[1.2] no-underline" href="/" aria-label={`${profile.name}, home`}>
+      <span class="font-display text-17 font-bold tracking-[0.01em] uppercase">{profile.name}</span>
+      <span class="font-display text-14 font-light text-text-muted">{profile.title}</span>
+    </a>
+
+    <button
+      class="menu-toggle hidden cursor-pointer items-center gap-2 rounded-card border border-border px-3 py-2 font-medium js:max-md:inline-flex"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-nav"
+    >
+      <span class="flex w-4 flex-col gap-[3px]" aria-hidden="true">
+        <span class="h-0.5 bg-current"></span>
+        <span class="h-0.5 bg-current"></span>
+        <span class="h-0.5 bg-current"></span>
+      </span>
+      Menu
+    </button>
+
+    <nav
+      id="site-nav"
+      class="nav js:max-md:hidden js:max-md:absolute js:max-md:inset-x-0 js:max-md:top-full js:max-md:border-b js:max-md:border-border js:max-md:bg-bg js:max-md:px-(--gutter) js:max-md:pt-2 js:max-md:pb-6 max-md:w-full max-md:pb-3 [&.is-open]:block"
+      aria-label="Main"
+    >
+      <ul class="flex gap-2 max-md:flex-col max-md:gap-0">
+        {
+          links.map((l) => (
+            <li>
+              <a
+                href={l.href}
+                aria-current={l.current ? 'page' : undefined}
+                download={l.download ? '' : undefined}
+                class="block rounded-card px-3 py-2 font-medium no-underline hover:bg-surface-raised aria-[current=page]:underline aria-[current=page]:decoration-case-accent aria-[current=page]:decoration-2 max-md:px-0 max-md:py-3 max-md:text-18"
+              >
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
+  const nav = document.getElementById('site-nav');
+  if (toggle && nav) {
+    const setOpen = (open: boolean) => {
+      toggle.setAttribute('aria-expanded', String(open));
+      nav.classList.toggle('is-open', open);
+    };
+    toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+    nav.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) setOpen(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && nav.classList.contains('is-open')) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+  }
+</script>

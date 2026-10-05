@@ -1,0 +1,23 @@
+---
+interface Props {
+  steps: string[];
+}
+
+const { steps } = Astro.props;
+---
+
+<section aria-labelledby="process-heading">
+  <h2 id="process-heading" class="eyebrow">Process</h2>
+  <ol class="mt-4 flex flex-wrap gap-2">
+    {
+      steps.map((step, i) => (
+        <li class="relative flex items-center gap-2 rounded-pill border border-border bg-surface py-2 pr-4 pl-3 font-display text-14 font-semibold md:not-last:after:absolute md:not-last:after:top-1/2 md:not-last:after:-right-2 md:not-last:after:h-px md:not-last:after:w-2 md:not-last:after:bg-case-accent">
+          <span class="text-case-accent-strong tabular-nums" aria-hidden="true">
+            {String(i + 1).padStart(2, '0')}
+          </span>
+          {step}
+        </li>
+      ))
+    }
+  </ol>
+</section>

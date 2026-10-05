@@ -1,0 +1,12 @@
+---
+// Two-tone olive/violet pill from the colour scheme. Decorative.
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<div class:list={['flex h-5 overflow-hidden rounded-card', className]} aria-hidden="true">
+  <span class="w-1/2 bg-olive"></span>
+  <span class="w-1/2 bg-violet"></span>
+</div>

@@ -1,0 +1,62 @@
+---
+import { getEntry, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import LinkButton from '../components/LinkButton.astro';
+import StarDivider from '../components/StarDivider.astro';
+import portrait from '../assets/site/portrait.jpg';
+
+const profile = (await getEntry('site', 'profile'))!.data;
+const cv = (await getEntry('site', 'cv'))!;
+const { Content } = await render(cv);
+const tel = profile.phone?.replace(/\s/g, '');
+---
+
+<Base title="About & CV – Malin Lilja, Senior UX & Product Designer" description={cv.data.description!} ogType="profile">
+  <div class="container-page grid gap-12 pt-12">
+    <header class="grid items-center gap-6 md:grid-cols-[auto_1fr_auto] md:gap-8">
+      <Image
+        class="size-28 rounded-media object-cover"
+        src={portrait}
+        alt="Portrait of Malin Lilja."
+        width={112}
+        height={112}
+        layout="fixed"
+        loading="eager"
+      />
+      <div>
+        <h1 class="flex flex-col gap-1">
+          <span class="text-48 font-bold uppercase">{profile.name}</span>
+          <span class="text-22 font-light text-text-muted">{profile.title}</span>
+        </h1>
+        <ul class="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-text-muted [&_a]:text-text">
+          <li>{profile.city}</li>
+          <li><a href={`mailto:${profile.email}`}>{profile.email}</a></li>
+          {profile.phone && <li><a href={`tel:${tel}`}>{profile.phone}</a></li>}
+          <li><a href={profile.linkedin} rel="me">LinkedIn</a></li>
+          <li class="hidden print:list-item"><a href={Astro.site}>{Astro.site?.host}</a></li>
+        </ul>
+      </div>
+      <div class="print:hidden">
+        <LinkButton href="/malin-lilja-cv.pdf" download variant="solid">Download CV (PDF)</LinkButton>
+      </div>
+    </header>
+
+    <div class="print:hidden"><StarDivider /></div>
+
+    <!-- On wide screens, section headings sit in a left column next to their content -->
+    <div
+      class="prose cv max-w-190 [&_h2]:text-22 [&_h2]:text-accent [&_h3]:text-17 [&_h3]:leading-[1.4] [&>h2:first-child]:mt-0 lg:grid lg:max-w-none lg:grid-cols-[220px_minmax(0,var(--container-reading))] lg:items-baseline lg:gap-x-16 lg:[&>*]:col-start-2 lg:[&>h2]:col-start-1 lg:[&>h2]:mt-12 lg:[&>h2+*]:mt-12 lg:[&>h2:first-child]:mt-0 lg:[&>h2:first-child+*]:mt-0"
+    >
+      <Content />
+      {
+        cv.data.beyondWork && (
+          <>
+            <h2>Beyond work</h2>
+            <p>{cv.data.beyondWork}</p>
+          </>
+        )
+      }
+    </div>
+  </div>
+</Base>

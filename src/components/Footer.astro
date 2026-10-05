@@ -1,0 +1,28 @@
+---
+import { getEntry } from 'astro:content';
+import StarDivider from './StarDivider.astro';
+
+const profile = (await getEntry('site', 'profile'))!.data;
+const tel = profile.phone?.replace(/\s/g, '');
+---
+
+<footer class="mt-24 pb-16 print:hidden">
+  <div class="container-page">
+    <StarDivider />
+    <div class="flex flex-wrap items-end justify-between gap-8 pt-12">
+      <div>
+        <h2 class="text-22 font-light text-text-muted">Let's talk</h2>
+        <a
+          class="mt-2 inline-block font-display text-32 leading-[1.2] font-semibold wrap-anywhere"
+          href={`mailto:${profile.email}`}>{profile.email}</a
+        >
+      </div>
+      <ul class="flex flex-wrap gap-x-6 gap-y-2 text-text-muted [&_a]:text-text">
+        <li><a href={profile.linkedin} rel="me">LinkedIn</a></li>
+        {profile.phone && <li><a href={`tel:${tel}`}>{profile.phone}</a></li>}
+        <li>{profile.city}</li>
+        <li><a href="/malin-lilja-cv.pdf" download>Download CV (PDF)</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
