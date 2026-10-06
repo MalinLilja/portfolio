@@ -13,6 +13,8 @@ export default defineConfig({
 
   trailingSlash: 'never',
   build: { format: 'file' },
+  // The page was renamed from About to Resume; keep old links working
+  redirects: { '/about': '/resume' },
   integrations: [sitemap()],
 
   image: {

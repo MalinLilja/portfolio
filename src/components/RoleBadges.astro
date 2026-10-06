@@ -1,0 +1,19 @@
+---
+// Malin's role on a project, as badges in the case's accent colour.
+interface Props {
+  roles: string[];
+  class?: string;
+}
+
+const { roles, class: className } = Astro.props;
+---
+
+{
+  roles.length > 0 && (
+    <ul class:list={['flex flex-wrap gap-2', className]} aria-label="My role">
+      {roles.map((role) => (
+        <li class="rounded-pill border border-case-accent-strong px-3 py-1 text-13 font-medium text-case-accent-strong">{role}</li>
+      ))}
+    </ul>
+  )
+}

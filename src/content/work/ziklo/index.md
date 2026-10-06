@@ -1,14 +1,17 @@
 ---
 title: Getting a residual value tool adopted by the people meant to use it
 client: Ziklo
-order: 4
+order: 1
 accent: ziklo
-theme: dark
 summary: Getting a residual value tool adopted by the people meant to use it.
 description: How Malin Lilja redesigned Ziklo's residual value tool around the team's real valuation process, and supported its rollout.
 tags: [Product design, User research, User adoption, via Amply]
-hero: ./project-board.jpg
-heroAlt: Ziklo RVE's project board, with car models in three columns for residual value analysis, council and decision, and activation.
+# Badges on the home page card: your role on the project
+roles: [Product designer]
+# Big tile in the summary bento: why the project existed (draft by Claude, rewrite freely)
+purpose: "Get the residual value tool adopted by fitting it to the team's real valuation process."
+hero: ./screens-overview.webp
+heroAlt: Four Ziklo RVE screens on a dark background - a car model's score breakdown with a 52% residual value suggestion, a project's model versions and reference models, a software score view, and the project board with columns for analysis, council and decision, and activation.
 tldr:
   company: Ziklo, The Mobility Bank, a car financing and leasing bank
   role: Product designer

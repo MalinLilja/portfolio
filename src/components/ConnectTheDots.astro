@@ -1,0 +1,199 @@
+---
+// "From first idea to shipped product" as a small connect-the-dots game on the home page.
+// Visitors click the numbered dots in order; each click draws the line to that dot and shows
+// what Malin does at that stage. The line starts as a messy scribble and gets cleaner, thicker
+// and more colourful towards the right, ending in a star: fidelity goes up as the work moves on.
+// Without JavaScript the whole line is drawn and every step is listed.
+import { hideGaps } from '../lib/brackets';
+
+interface Props {
+  title: string;
+  steps: { title: string; text: string }[];
+}
+
+const { title } = Astro.props;
+const steps = Astro.props.steps.slice(0, 6).map((s) => ({ ...s, text: hideGaps(s.text) }));
+
+// Drawing in a 1000 × 380 box. Dot n sits at the end of segment n-1.
+const dots = [
+  { x: 110, y: 230 },
+  { x: 250, y: 80 },
+  { x: 350, y: 270 },
+  { x: 500, y: 150 },
+  { x: 680, y: 230 },
+  { x: 920, y: 190 },
+];
+// Low fidelity on the left (loose scribbles, thin grey line) to high on the right
+// (clean curve, thick accent line). Widths are in screen pixels, see the script.
+const segments = [
+  // The first idea: a tangle that ends in dot 1
+  { d: 'M70 140 C20 250 150 310 175 225 C200 140 60 105 48 195 C38 275 205 300 195 200 C185 120 85 165 110 230', w: 1.5, color: 'var(--color-stars)' },
+  // Understanding: still loopy
+  { d: 'M110 230 C160 325 265 265 222 160 C195 95 140 140 182 172 C230 210 205 62 250 80', w: 1.5, color: 'var(--color-stars)' },
+  // Sketching: one loose loop
+  { d: 'M250 80 C322 42 345 160 292 190 C250 215 282 118 322 160 C358 200 332 250 350 270', w: 2, color: 'var(--color-text-muted)' },
+  // Prototype: straight wireframe lines
+  { d: 'M350 270 L362 176 L402 172 L426 232 L452 150 L500 150', w: 2.25, color: 'var(--color-text-muted)' },
+  // Design: a smooth wave
+  { d: 'M500 150 C540 160 532 252 582 240 C622 230 640 215 680 230', w: 2.75, color: 'var(--color-accent)' },
+  // Ship: one clean curve into the star
+  { d: 'M680 230 C760 262 840 250 895.3 182', w: 3.25, color: 'var(--color-accent)' },
+];
+const star =
+  'M895.3 182 L913.5 181.1 L920 164 L926.5 181.1 L944.7 182 L930.5 193.4 L935.3 211 L920 201 L904.7 211 L909.5 193.4 Z';
+const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(2)}%`;
+---
+
+<section class="connect-dots pt-[clamp(64px,12vh,140px)]" aria-labelledby="journey-heading">
+  <div class="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+    <div>
+      <p class="eyebrow">How I work</p>
+      <h2 id="journey-heading" class="mt-3 max-w-[18ch] text-48 leading-none">{title}</h2>
+    </div>
+    <div class="hidden gap-2 js:flex">
+      <button type="button" class="dots-all rounded-pill border border-border px-4 py-2 text-14 hover:border-text-muted">Connect all</button>
+      <button type="button" class="dots-reset hidden rounded-pill border border-border px-4 py-2 text-14 hover:border-text-muted">Start over</button>
+    </div>
+  </div>
+
+  <div class="dots-board relative mt-8 aspect-[1000/380] w-full">
+    <svg class="absolute inset-0 size-full overflow-visible" viewBox="0 0 1000 380" fill="none" aria-hidden="true">
+      {
+        segments.map((s, i) => (
+          <path
+            class="dots-segment opacity-0 transition-[stroke-dashoffset] duration-700 ease-out [stroke-dashoffset:1] no-js:opacity-100 no-js:[stroke-dashoffset:0] data-[drawn]:opacity-100 data-[drawn]:[stroke-dashoffset:0]"
+            data-index={i}
+            d={s.d}
+            stroke={s.color}
+            style={`--w: ${s.w}`}
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            pathLength="1"
+            stroke-dasharray="1 1"
+          />
+        ))
+      }
+      <path
+        class="dots-star opacity-0 transition-[stroke-dashoffset,fill] duration-700 ease-out [fill:transparent] [stroke-dashoffset:1] no-js:opacity-100 no-js:[stroke-dashoffset:0] no-js:fill-accent data-[drawn]:opacity-100 data-[drawn]:fill-accent data-[drawn]:[stroke-dashoffset:0]"
+        d={star}
+        stroke="var(--color-accent)"
+        style="--w: 3.25"
+        stroke-linejoin="round"
+        pathLength="1"
+        stroke-dasharray="1 1"
+      />
+    </svg>
+
+    {
+      dots.map((dot, i) => (
+        <button
+          type="button"
+          class="dots-dot group/dot absolute size-11 -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-pill"
+          style={`left: ${pct(dot.x, 1000)}; top: ${pct(dot.y, 380)}`}
+          data-step={i + 1}
+          aria-label={`${i + 1}. ${steps[i]?.title ?? ''}`}
+          aria-controls="journey-steps"
+        >
+          {/* Numbers like a dot-to-dot puzzle */}
+          <span class="absolute -top-2.5 -left-1.5 font-support text-14 text-text-muted tabular-nums group-data-[done]/dot:text-text" aria-hidden="true">
+            {i + 1}
+          </span>
+          <span class="absolute top-1/2 left-1/2 size-3 -translate-1/2 rounded-pill bg-stars transition-[background-color,scale] duration-300 group-hover/dot:scale-150 group-data-[done]/dot:bg-text group-data-[next]/dot:bg-accent group-data-[next]/dot:motion-safe:animate-pulse no-js:bg-text" />
+          <span class="absolute top-1/2 left-1/2 size-6 -translate-1/2 rounded-pill border-2 border-accent opacity-0 transition-opacity group-aria-[current=step]/dot:opacity-100" />
+        </button>
+      ))
+    }
+  </div>
+
+  <div id="journey-steps" class="mt-6 min-h-36 max-w-[52ch]" aria-live="polite">
+    <p class="dots-hint hidden text-text-muted js:block">Start at dot 1 and follow the numbers.</p>
+    <ol class="grid gap-8 js:block">
+      {
+        steps.map((step, i) => (
+          <li class="dots-step js:hidden" data-step={i + 1}>
+            <p class="eyebrow text-14 tabular-nums">
+              {String(i + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}
+            </p>
+            <h3 class="mt-2 font-headline text-22 leading-snug font-medium tracking-normal">{step.title}</h3>
+            <p class="mt-2 text-text-muted">{step.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('.connect-dots')) {
+    const board = root.querySelector<HTMLElement>('.dots-board')!;
+    const svg = board.querySelector('svg')!;
+    const segments = [...root.querySelectorAll<SVGPathElement>('.dots-segment')];
+    const star = root.querySelector<SVGPathElement>('.dots-star')!;
+    const dots = [...root.querySelectorAll<HTMLButtonElement>('.dots-dot')];
+    const steps = [...root.querySelectorAll<HTMLElement>('.dots-step')];
+    const hint = root.querySelector<HTMLElement>('.dots-hint')!;
+    const allButton = root.querySelector<HTMLButtonElement>('.dots-all')!;
+    const resetButton = root.querySelector<HTMLButtonElement>('.dots-reset')!;
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    const STEP_MS = 650;
+    let connected = 0;
+
+    // The drawing scales with the page, but the line weights should stay the same on screen
+    const scaleStrokes = () => {
+      const k = 1000 / Math.max(svg.getBoundingClientRect().width, 1);
+      for (const path of [...segments, star]) {
+        path.style.strokeWidth = String(Number(path.style.getPropertyValue('--w')) * k);
+      }
+    };
+    new ResizeObserver(scaleStrokes).observe(board);
+
+    const show = (step: number) => {
+      hint.classList.toggle('js:block', step === 0);
+      steps.forEach((el, i) => el.classList.toggle('js:hidden', i !== step - 1));
+      dots.forEach((dot, i) => {
+        dot.toggleAttribute('data-done', i < connected);
+        dot.toggleAttribute('data-next', i === connected);
+        if (i === step - 1) dot.setAttribute('aria-current', 'step');
+        else dot.removeAttribute('aria-current');
+      });
+      resetButton.classList.toggle('hidden', connected === 0);
+      allButton.classList.toggle('hidden', connected === dots.length);
+    };
+
+    // Draws the line up to dot `step`, one segment after the other
+    const connectTo = (step: number) => {
+      const delay = reduceMotion.matches ? 0 : STEP_MS;
+      for (let i = connected; i < step; i++) {
+        const order = i - connected;
+        segments[i].style.transitionDelay = `${order * delay}ms`;
+        segments[i].toggleAttribute('data-drawn', true);
+      }
+      if (step === dots.length) {
+        star.style.transitionDelay = `${(step - connected) * delay}ms`;
+        star.toggleAttribute('data-drawn', true);
+      }
+      connected = Math.max(connected, step);
+      show(step);
+    };
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => connectTo(i + 1));
+      // With a mouse, hovering is enough: the next dot connects, connected dots show their step.
+      // Dots further ahead only react to a click, so sweeping across the board doesn't skip steps.
+      dot.addEventListener('pointerenter', (event) => {
+        if (event.pointerType === 'mouse' && i <= connected) connectTo(i + 1);
+      });
+    });
+    allButton.addEventListener('click', () => connectTo(dots.length));
+    resetButton.addEventListener('click', () => {
+      for (const path of [...segments, star]) {
+        path.style.transitionDelay = '0ms';
+        path.removeAttribute('data-drawn');
+      }
+      connected = 0;
+      show(0);
+      dots[0].focus();
+    });
+    show(0);
+  }
+</script>

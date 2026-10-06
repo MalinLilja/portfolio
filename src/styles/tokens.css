@@ -1,6 +1,6 @@
 /*
-  Design tokens = Tailwind theme. The root colours are the cream default theme;
-  [data-theme] and [data-case] blocks below override them per page.
+  Design tokens = Tailwind theme. The root colours are the site theme, used on every page;
+  [data-case] blocks below only swap in each client's accent colour.
  Names mirror the Figma variables, and each
   token becomes a Tailwind class:
 
@@ -25,34 +25,29 @@
   --text-*: initial;
   --breakpoint-*: initial;
 
-  /* Colour – site default: cream editorial (home, about, 404) */
-  --color-bg: #fdf7d3;
-  --color-surface: #fffbe8;
-  --color-surface-raised: #fffdf3;
-  --color-border: #ddd3a2;
-  --color-text: #08070a;
-  --color-text-muted: #55513a;
-  --color-accent: #5a48c4;
-  --color-on-accent: #fdf7d3;
-  --color-focus: #5a48c4;
-  --color-stars: #8a8566;
+  /* Colour – site default: black editorial (home, resume, 404) */
+  --color-bg: #08080a;
+  --color-surface: #131216;
+  --color-surface-raised: #1a191e;
+  --color-border: #323236;
+  --color-text: #fffdfa;
+  --color-text-muted: #bdbab5;
+  --color-accent: #a99cf2;
+  --color-on-accent: #08080a;
+  --color-focus: #a99cf2;
+  --color-stars: #8a8a8e;
 
-  /* Brand palette from the colour scheme video */
-  --color-cream: #fdf7d3;
-  --color-ink: #08070a;
-  --color-on-ink: #fdf7d3;
-  --color-on-ink-muted: #c9c3a3;
+  /* Brand violet: the default case accent */
   --color-violet: #6d5ccf;
-  --color-olive: #87922d;
-  --color-olive-strong: #5d6619;
-  --color-glow: #eda4df;
 
-  /* Gradient card (blue → lavender) and the text that sits on it.
-     The scrim darkens the image so cream text keeps 3:1 or more. */
-  --color-gradient-start: #6f8ff0;
-  --color-gradient-end: #c4b7ff;
-  --color-gradient-scrim: rgb(40 30 120 / 0.35);
-  --color-on-gradient: #fbf9e6;
+  /* Liquid hero (WebGL satin from explorations/liquid-landing.html, "Iris" preset).
+     deep → mid → light is the colour ramp, shine is the highlight. */
+  --color-liquid-deep: #0057ba;
+  --color-liquid-mid: #b8b8ff;
+  --color-liquid-light: #dcd5ff;
+  --color-liquid-shine: #f3dfc4;
+  --color-on-liquid: #150f2e;
+  --color-on-liquid-muted: rgb(21 15 46 / 0.78);
 
   /* Image zoom overlay (same on every page) */
   --color-overlay: rgb(8 8 12 / 0.94);
@@ -69,15 +64,28 @@
   /* Type */
   --font-display: "Unbounded Variable", "Arial Black", system-ui, sans-serif;
   --font-body: "Ubuntu Sans Variable", "Segoe UI", system-ui, sans-serif;
-  --font-mono: "DM Mono", ui-monospace, "Cascadia Mono", monospace;
+  /* Long display text (purpose lines, intro lead, case titles). Unbounded is kept for short
+     brand text: name, positioning line, section headings, client names. Use with font-medium. */
+  --font-headline: "Ubuntu Sans Variable", "Segoe UI", system-ui, sans-serif;
+  /* Supporting type: Bitcount pixel font with round dots (Element Shape 0; 80 would be stars) */
+  --font-support: "Bitcount Single Variable", ui-monospace, "Cascadia Mono", monospace;
+  --font-support--font-variation-settings: "ELSH" 0;
   --text-13: 0.8125rem;
   --text-14: 0.875rem;
+  /* Body text */
+  --text-16: 1rem;
   --text-17: 1.0625rem;
   --text-18: 1.125rem;
   --text-22: 1.375rem;
   --text-32: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
   --text-48: clamp(2rem, 1.4rem + 2.4vw, 3rem);
   --text-72: clamp(2.5rem, 1.6rem + 3.6vw, 4.5rem);
+  /* The giant name in the home page hero */
+  --text-hero: clamp(3rem, 11vw, 10.5rem);
+  /* Unbounded headings, names and card titles (small 14px labels stay semibold) */
+  --font-weight-heading: 400;
+  /* Malin's name: gradient card, Resume page, header */
+  --font-weight-name: 700;
   --leading-body: 1.6;
   --leading-tight: 1.15;
 
@@ -97,86 +105,35 @@
 
   /* Motion */
   --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
-
-  /* The gradient card's slow flow (switched off for reduced motion) */
-  --animate-drift: drift 24s ease-in-out infinite alternate;
-  @keyframes drift {
-    from { background-position: 0% 30%, 0% 30%; }
-    to { background-position: 0% 30%, 100% 70%; }
-  }
 }
 
 :root {
   --gutter: clamp(--spacing(4), 4vw, --spacing(12));
   --header-height: 4.25rem;
-  color-scheme: light;
-}
-
-/* Dark pages (SmartOpt, Ziklo): the previous site default */
-[data-theme="dark"] {
-  --color-bg: #0e0e14;
-  --color-surface: #18181f;
-  --color-surface-raised: #22222c;
-  --color-border: #2f2e3b;
-  --color-text: #f3f2f8;
-  --color-text-muted: #b3b1c4;
-  --color-accent: #b9b1ff;
-  --color-on-accent: #13112a;
-  --color-focus: #d9d4ff;
-  --color-case-accent: #b9b1ff;
-  --color-case-accent-strong: #b9b1ff;
-  --color-stars: var(--color-case-accent);
   color-scheme: dark;
 }
 
-/* Light pages (Qmatic, Länsförsäkringar) */
-[data-theme="light"] {
-  --color-bg: #f2f3f7;
-  --color-surface: #ffffff;
-  --color-surface-raised: #ffffff;
-  --color-border: #d5d8e1;
-  --color-text: #15151d;
-  --color-text-muted: #4b4b5c;
-  --color-accent: #4b3fc4;
-  --color-on-accent: #ffffff;
-  --color-focus: #4b3fc4;
-  --color-case-accent: #4b3fc4;
-  --color-case-accent-strong: #4b3fc4;
-  --color-stars: var(--color-case-accent);
-  color-scheme: light;
-}
-
-/* Per-case brand colours */
+/* Per-case brand accent. Case pages use the site theme; only the client's colour
+   carries through, on the client label, the TL;DR bar and labels, process step
+   numbers and list markers. Every value is AA (4.5:1+) on bg, surface and
+   surface-raised. Länsförsäkringar's brand blue (#005aa0) is too dark on black,
+   so it uses a lighter tint. */
 [data-case="smartopt"] {
-  --color-bg: #151b2b;
-  --color-surface: #1e2639;
-  --color-surface-raised: #273149;
-  --color-border: #34405c;
   --color-case-accent: #4ee0b0;
   --color-case-accent-strong: #4ee0b0;
 }
 
 [data-case="ziklo"] {
-  --color-bg: #12161c;
-  --color-surface: #1b2129;
-  --color-surface-raised: #242c36;
-  --color-border: #313b48;
   --color-case-accent: #7fd88a;
   --color-case-accent-strong: #7fd88a;
 }
 
 [data-case="qmatic"] {
-  --color-bg: #f1f3f5;
   --color-case-accent: #5ac21e;
-  --color-case-accent-strong: #2e6e0a;
+  --color-case-accent-strong: #5ac21e;
 }
 
 [data-case="lansforsakringar"] {
-  --color-bg: #d7e9f7;
-  --color-surface: #f4f9fd;
-  --color-surface-raised: #ffffff;
-  --color-border: #b3cfe6;
-  --color-text-muted: #34495c;
-  --color-case-accent: #005aa0;
-  --color-case-accent-strong: #004f8c;
+  --color-case-accent: #4f9fe6;
+  --color-case-accent-strong: #4f9fe6;
 }

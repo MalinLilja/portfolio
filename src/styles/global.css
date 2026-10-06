@@ -11,14 +11,14 @@
   }
 
   body {
-    @apply bg-bg font-body text-17 leading-body text-text antialiased lg:text-18;
+    @apply bg-bg font-body text-16 leading-body text-text antialiased;
   }
 
   h1,
   h2,
   h3,
   h4 {
-    @apply font-display leading-tight font-semibold tracking-[-0.01em] text-balance;
+    @apply font-display leading-tight font-heading tracking-[-0.01em] text-balance;
   }
 
   p {
@@ -52,8 +52,10 @@
   padding-inline: var(--gutter);
 }
 
+/* Supporting type: Bitcount dots, sentence case, muted. Medium weight keeps the dots
+   distinct; bold fills them into blocks. */
 @utility eyebrow {
-  @apply font-mono text-14 font-medium tracking-[0.08em] text-text-muted uppercase;
+  @apply font-support text-17 font-medium tracking-normal text-text-muted;
 }
 
 /* Long-form text generated from Markdown: case study bodies and the CV */
@@ -163,15 +165,14 @@
   }
 }
 
-/* Print: the CV PDF is printed from /about (scripts/cv-pdf.mjs) */
+/* Print: the CV PDF is printed from /resume (scripts/resume-pdf.mjs) */
 @media print {
   @page {
     size: A4;
     margin: 14mm 16mm;
   }
 
-  :root,
-  [data-theme] {
+  :root {
     --color-bg: #ffffff;
     --color-surface: #ffffff;
     --color-surface-raised: #ffffff;

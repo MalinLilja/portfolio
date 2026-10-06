@@ -1,0 +1,39 @@
+---
+// "Practice" on the home page: how Malin works, as three numbered stages with key activities.
+import { hideGaps, hideGapItems } from '../lib/brackets';
+
+interface Props {
+  title: string;
+  lead?: string;
+  stages: { title: string; text: string; points: string[] }[];
+}
+
+const { title, lead, stages } = Astro.props;
+---
+
+<section class="pt-24" aria-labelledby="practice-heading">
+  <h2 id="practice-heading" class="text-48 leading-none">{title}</h2>
+  {lead && <p class="mt-4 max-w-[40ch] text-22 text-text-muted">{hideGaps(lead)}</p>}
+
+  <ol class="mt-10 grid gap-4 md:gap-6 lg:grid-cols-3">
+    {
+      stages.map((stage, i) => (
+        <li class="flex flex-col gap-4 rounded-media border border-border bg-surface p-6 md:p-8">
+          <span class="eyebrow text-14 tabular-nums">{String(i + 1).padStart(2, '0')}</span>
+          <h3 class="text-22 leading-tight">{stage.title}</h3>
+          <p class="text-text-muted">{hideGaps(stage.text)}</p>
+          {stage.points.length > 0 && (
+            <ul class="mt-auto grid gap-2 border-t border-border pt-5">
+              {hideGapItems(stage.points).map((point) => (
+                <li class="flex gap-3 text-14">
+                  <span class="mt-[0.45em] size-1.5 shrink-0 rounded-pill bg-accent" aria-hidden="true" />
+                  {point}
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</section>

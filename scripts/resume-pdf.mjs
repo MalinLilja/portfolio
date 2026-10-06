@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// Prints /about to public/malin-lilja-cv.pdf with a local Chrome or Edge, so the
+// Prints /resume to public/malin-lilja-resume.pdf with a local Chrome or Edge, so the
 // CV PDF is real text that applicant tracking systems can read.
 //
-//   npm run build && npm run cv:pdf
+//   npm run build && npm run resume:pdf
 //
 // Set CHROME_PATH if the browser isn't found.
 
@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const out = join(root, 'public', 'malin-lilja-cv.pdf');
+const out = join(root, 'public', 'malin-lilja-resume.pdf');
 const port = 4399;
 
 const candidates = [
@@ -25,11 +25,11 @@ const candidates = [
 ].filter(Boolean);
 const browser = candidates.find((p) => existsSync(p));
 if (!browser) {
-  console.error('cv-pdf: no Chrome or Edge found. Set CHROME_PATH.');
+  console.error('resume-pdf: no Chrome or Edge found. Set CHROME_PATH.');
   process.exit(1);
 }
-if (!existsSync(join(root, 'dist', 'about.html'))) {
-  console.error('cv-pdf: dist/about.html is missing. Run npm run build first.');
+if (!existsSync(join(root, 'dist', 'resume.html'))) {
+  console.error('resume-pdf: dist/resume.html is missing. Run npm run build first.');
   process.exit(1);
 }
 
@@ -38,7 +38,7 @@ const server = spawn('npx', ['astro', 'preview', '--port', String(port)], { cwd:
 async function waitForServer() {
   for (let i = 0; i < 60; i++) {
     try {
-      if ((await fetch(`http://localhost:${port}/about`)).ok) return;
+      if ((await fetch(`http://localhost:${port}/resume`)).ok) return;
     } catch {}
     await new Promise((r) => setTimeout(r, 500));
   }
@@ -52,9 +52,9 @@ try {
     '--disable-gpu',
     '--no-pdf-header-footer',
     `--print-to-pdf=${out}`,
-    `http://localhost:${port}/about`,
+    `http://localhost:${port}/resume`,
   ], { stdio: 'ignore' });
-  console.log(`cv-pdf: wrote ${out} (${Math.round(statSync(out).size / 1024)} kB)`);
+  console.log(`resume-pdf: wrote ${out} (${Math.round(statSync(out).size / 1024)} kB)`);
 } finally {
   if (process.platform === 'win32') {
     try { execFileSync('taskkill', ['/pid', String(server.pid), '/T', '/F'], { stdio: 'ignore' }); } catch {}

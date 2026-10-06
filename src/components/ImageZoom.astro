@@ -39,7 +39,7 @@
     if (!dialog || !big) return;
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'block w-full cursor-zoom-in rounded-media';
+    button.className = 'block h-full w-full cursor-zoom-in rounded-media';
     button.setAttribute('aria-label', `Enlarge image: ${img.alt}`);
     img.replaceWith(button);
     button.append(img);

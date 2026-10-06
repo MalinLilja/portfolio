@@ -10,7 +10,7 @@ All copy is in Markdown. Edit a file, save, and push; no code needed.
 |---|---|
 | Home page intro, experience, ILP "Coming soon" card, quote | `src/content/site/home.md` |
 | Name, email, phone, LinkedIn, city | `src/content/site/profile.md` |
-| CV on /about | `src/content/site/cv.md` |
+| Resume on /resume | `src/content/site/cv.md` |
 | A case study | `src/content/work/<case>/index.md` |
 
 - **Gaps:** write `[what's missing]` anywhere. It's hidden on the site until you replace it. If a gap sits mid-sentence, the sentence is cut back to the last comma, or hidden, so nothing reads as broken.
@@ -25,7 +25,7 @@ All copy is in Markdown. Edit a file, save, and push; no code needed.
 | `npm run dev` | Local site at http://localhost:4321 |
 | `npm run build` | Build to `dist/`, then run the forbidden-terms check on the result |
 | `npm run check:copy` | Forbidden-terms check on the source (also runs before every commit) |
-| `npm run cv:pdf` | After a build: print /about to `public/malin-lilja-cv.pdf` with Chrome |
+| `npm run resume:pdf` | After a build: print /resume to `public/malin-lilja-resume.pdf` with Chrome |
 
 Design tokens (colours, type, radius, layout) live in `src/styles/tokens.css` and become Tailwind classes, e.g. `--color-surface` → `bg-surface`.
 

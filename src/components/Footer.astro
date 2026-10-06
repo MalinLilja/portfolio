@@ -13,7 +13,7 @@ const tel = profile.phone?.replace(/\s/g, '');
       <div>
         <h2 class="text-22 font-light text-text-muted">Let's talk</h2>
         <a
-          class="mt-2 inline-block font-display text-32 leading-[1.2] font-semibold wrap-anywhere"
+          class="mt-2 inline-block font-display text-32 leading-[1.2] font-heading wrap-anywhere"
           href={`mailto:${profile.email}`}>{profile.email}</a
         >
       </div>
@@ -21,7 +21,6 @@ const tel = profile.phone?.replace(/\s/g, '');
         <li><a href={profile.linkedin} rel="me">LinkedIn</a></li>
         {profile.phone && <li><a href={`tel:${tel}`}>{profile.phone}</a></li>}
         <li>{profile.city}</li>
-        <li><a href="/malin-lilja-cv.pdf" download>Download CV (PDF)</a></li>
       </ul>
     </div>
   </div>

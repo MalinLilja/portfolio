@@ -12,7 +12,7 @@ const { Content } = await render(cv);
 const tel = profile.phone?.replace(/\s/g, '');
 ---
 
-<Base title="About & CV – Malin Lilja, Senior UX & Product Designer" description={cv.data.description!} ogType="profile">
+<Base title="Resume – Malin Lilja, Senior UX & Product Designer" description={cv.data.description!} ogType="profile">
   <div class="container-page grid gap-12 pt-12">
     <header class="grid items-center gap-6 md:grid-cols-[auto_1fr_auto] md:gap-8">
       <Image
@@ -26,7 +26,7 @@ const tel = profile.phone?.replace(/\s/g, '');
       />
       <div>
         <h1 class="flex flex-col gap-1">
-          <span class="text-48 font-bold uppercase">{profile.name}</span>
+          <span class="text-48 font-name uppercase">{profile.name}</span>
           <span class="text-22 font-light text-text-muted">{profile.title}</span>
         </h1>
         <ul class="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-text-muted [&_a]:text-text">
@@ -38,7 +38,7 @@ const tel = profile.phone?.replace(/\s/g, '');
         </ul>
       </div>
       <div class="print:hidden">
-        <LinkButton href="/malin-lilja-cv.pdf" download variant="solid">Download CV (PDF)</LinkButton>
+        <LinkButton href="/malin-lilja-resume.pdf" download variant="solid">Download resume (PDF)</LinkButton>
       </div>
     </header>
 

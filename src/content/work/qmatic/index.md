@@ -1,12 +1,15 @@
 ---
 title: A new SaaS appointment platform, and the design system behind it
 client: Qmatic
-order: 1
+order: 3
 accent: qmatic
-theme: light
 summary: A new SaaS appointment platform and the design system behind it.
 description: How Malin Lilja researched and designed Qmatic's new SaaS appointment platform, owned its design system backlog and introduced Lean UX as Agile Team Lead.
 tags: [Product design, User research, Design system, WCAG, Team lead]
+# Badges on the home page card: your role on the project
+roles: [UX/UI designer, Agile team lead]
+# Big tile in the summary bento: why the project existed (draft by Claude, rewrite freely)
+purpose: "Build one cloud appointment platform that works for very different public and private sector clients."
 hero: ./staff-view.jpg
 heroAlt: The start page of Qmatic Experience Cloud for staff, with a menu for booking, planning, check-in and serving, and help cards.
 tldr:

@@ -1,0 +1,14 @@
+---
+// One tile in a summary bento: a small Bitcount label above any content.
+interface Props {
+  label?: string;
+  class?: string;
+}
+
+const { label, class: className } = Astro.props;
+---
+
+<div class:list={['flex min-w-0 flex-col gap-2 rounded-media border border-border bg-surface p-5 md:p-6', className]}>
+  {label && <span class="eyebrow text-14">{label}</span>}
+  <slot />
+</div>

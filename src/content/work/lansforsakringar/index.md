@@ -1,12 +1,15 @@
 ---
 title: Five internal services for a regional insurer, including a GDPR compliance tool
 client: Länsförsäkringar
-order: 3
+order: 4
 accent: lansforsakringar
-theme: light
 summary: 5 internal services, including a GDPR compliance tool.
 description: How Malin Lilja owned design and project management for 5 internal services at Länsförsäkringar Göteborg och Bohuslän, including the GDPR tool Personuppgiftskollen.
 tags: [UX/UI design, Project management, Product ownership, via Amply]
+# Badges on the home page card: your role on the project
+roles: [UX/UI designer, Project manager, Product owner]
+# Big tile in the summary bento: why the project existed (draft by Claude, rewrite freely)
+purpose: "Streamline and align internal processes across teams with tailored digital services."
 hero: ./mina-sidor.jpg
 heroAlt: Personuppgiftskollen's "My pages" view, a table of personal data processing records with a message feed beside it.
 tldr:

@@ -64,7 +64,8 @@ if (checkDist) {
     checkText(file, html);
     const visible = html
       .replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, '')
-      .replace(/<[^>]+>/g, ' ')
+      // tags, including attributes that contain ">" (e.g. Tailwind's [&>*] classes)
+      .replace(/<(?:"[^"]*"|'[^']*'|[^'">])*>/g, ' ')
       .replace(/&#91;/g, '[');
     const gap = visible.match(/\[[^\]]{1,120}\]/);
     if (gap) report(file, `a [bracket] gap reached the page: ${gap[0]}`);

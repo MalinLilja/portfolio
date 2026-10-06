@@ -10,16 +10,17 @@
     "build": "astro build && node scripts/check-copy.mjs --dist",
     "preview": "astro preview",
     "check:copy": "node scripts/check-copy.mjs",
-    "cv:pdf": "node scripts/cv-pdf.mjs",
+    "resume:pdf": "node scripts/resume-pdf.mjs",
     "prepare": "git config core.hooksPath .githooks || true",
     "astro": "astro"
   },
   "dependencies": {
     "@astrojs/markdown-satteri": "^0.4.2",
     "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/bitcount-single": "^5.3.0",
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
     "@fontsource-variable/ubuntu-sans": "^5.3.0",
     "@fontsource-variable/unbounded": "^5.3.0",
-    "@fontsource/dm-mono": "^5.3.0",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.5",
     "tailwindcss": "^4.3.3"

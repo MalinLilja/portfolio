@@ -1,0 +1,224 @@
+---
+// Selected work as a carousel, one case per slide. Each slide is one card, split into bento
+// sections by hairlines: picture,
+// number, company, role badges and purpose, and links to the case study ("Coming soon"
+// cases don't link). Scroll-snap does the sliding, so swiping works; a little script
+// wires up the arrows and dots. No autoplay.
+// Scrolling with the mouse wheel over the cards moves one card at a time; at the first or
+// last card, and anywhere outside the carousel, the wheel scrolls the page as usual.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import RoleBadges from './RoleBadges.astro';
+import { hideGaps } from '../lib/brackets';
+
+interface Item {
+  client: string;
+  /** "Name, description" – the part after the first comma is shown as the description */
+  company?: string;
+  purpose?: string;
+  roles: string[];
+  href?: string;
+  note?: string;
+  accent?: string;
+  image?: ImageMetadata;
+  imageAlt?: string;
+}
+
+interface Props {
+  items: Item[];
+  /** id of the heading that names the carousel */
+  labelledby: string;
+}
+
+const { items, labelledby } = Astro.props;
+const control =
+  'grid size-11 cursor-pointer place-items-center rounded-pill border border-border bg-surface text-18 text-text transition-[border-color,opacity] duration-160 ease-out enabled:hover:border-text disabled:cursor-default disabled:opacity-35';
+---
+
+<div class="work-carousel" role="region" aria-roledescription="carousel" aria-labelledby={labelledby}>
+<ol
+  id="work-slides"
+  class="carousel-track flex snap-x snap-mandatory gap-4 overflow-x-auto pr-[12%] md:gap-6 md:pr-[10%] [scrollbar-width:none] motion-safe:scroll-smooth [&::-webkit-scrollbar]:hidden"
+  aria-live="polite"
+>
+  {
+    items.map((item, i) => {
+      const Tag = item.href ? 'a' : 'div';
+      const purpose = hideGaps(item.purpose);
+      const about = hideGaps(item.company).split(', ').slice(1).join(', ');
+      return (
+        <li
+          data-case={item.accent}
+          data-client={item.client}
+          class="w-[88%] shrink-0 snap-start transition-opacity duration-300 ease-out md:w-[90%] [&[inert]]:opacity-40"
+          aria-roledescription="slide"
+          aria-label={`${i + 1} of ${items.length}: ${item.client}`}
+        >
+          <Tag
+            href={item.href}
+            class:list={[
+              'grid h-full overflow-hidden rounded-media border bg-surface no-underline md:grid-cols-2',
+              item.href
+                ? 'group border-border transition-colors duration-160 ease-out hover:border-case-accent'
+                : 'border-dashed border-stars',
+            ]}
+          >
+            <div class="aspect-16/10 overflow-hidden border-b border-border bg-bg md:aspect-auto md:min-h-80 md:border-r md:border-b-0">
+              {item.image ? (
+                <Image
+                  src={item.image}
+                  alt={item.imageAlt ?? ''}
+                  widths={[480, 720, 1080]}
+                  sizes="(min-width: 1248px) 600px, (min-width: 720px) 50vw, 100vw"
+                  loading={i < 2 ? 'eager' : 'lazy'}
+                  class="h-full! w-full! max-w-none! object-cover object-left-top transition-transform duration-600 ease-out group-hover:scale-[1.03]"
+                />
+              ) : (
+                <div class="grid size-full place-items-center bg-[linear-gradient(140deg,var(--color-liquid-deep),var(--color-liquid-light)_55%,var(--color-liquid-mid))]">
+                  <span class="eyebrow text-on-liquid">{item.note}</span>
+                </div>
+              )}
+            </div>
+
+            <!-- One card, divided into bento sections by hairlines -->
+            <div class="grid grid-rows-[1fr_auto]">
+              <div class="flex flex-col gap-3 p-6 md:p-8">
+                <div class="flex items-baseline justify-between gap-4">
+                  <span class="eyebrow text-14">
+                    {String(i + 1).padStart(2, '0')} · Purpose
+                  </span>
+                  {item.href && (
+                    <span class="text-22 transition-transform duration-160 ease-out group-hover:translate-x-1" aria-hidden="true">
+                      →
+                    </span>
+                  )}
+                </div>
+                {purpose && <p class="font-headline text-18 leading-snug font-medium text-balance md:text-22">{purpose}</p>}
+              </div>
+
+              <div class="grid border-t border-border sm:grid-cols-2">
+                <div class="flex min-w-0 flex-col gap-2 p-6 md:px-8">
+                  <span class="eyebrow text-14">Company</span>
+                  <h3 class="text-22 leading-tight wrap-anywhere">{item.client}</h3>
+                  {about && <p class="text-14 text-text-muted">{about}</p>}
+                </div>
+                <div class="flex min-w-0 flex-col gap-2 border-t border-border p-6 sm:border-t-0 sm:border-l md:px-8">
+                  <span class="eyebrow text-14">My role</span>
+                  <RoleBadges roles={item.roles} />
+                </div>
+              </div>
+            </div>
+          </Tag>
+        </li>
+      );
+    })
+  }
+</ol>
+
+<div class="mt-6 flex items-center justify-between gap-4">
+  <button type="button" class:list={['carousel-prev', control]} aria-controls="work-slides" aria-label="Previous case">
+    <span aria-hidden="true">←</span>
+  </button>
+  <div class="flex flex-wrap justify-center gap-1">
+    {
+      items.map((item, i) => (
+        <button
+          type="button"
+          class="carousel-dot group/dot grid size-6 cursor-pointer place-items-center"
+          aria-controls="work-slides"
+          aria-label={`Show case ${i + 1}: ${item.client}`}
+          aria-current={i === 0 ? 'true' : undefined}
+        >
+          <span class="block size-2 rounded-pill bg-border transition-[background-color,width] duration-160 ease-out group-hover/dot:bg-text-muted group-aria-[current=true]/dot:w-6 group-aria-[current=true]/dot:bg-accent" />
+        </button>
+      ))
+    }
+  </div>
+  <button
+    type="button"
+    class="carousel-next flex h-11 cursor-pointer items-center gap-3 rounded-pill border border-border bg-surface px-4 text-text transition-[border-color,opacity] duration-160 ease-out enabled:hover:border-text disabled:cursor-default disabled:opacity-35"
+    aria-controls="work-slides"
+    aria-label="Next case"
+  >
+    <span class="carousel-next-label hidden text-14 text-text-muted md:inline" aria-hidden="true"></span>
+    <span class="text-18" aria-hidden="true">→</span>
+  </button>
+</div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.work-carousel').forEach((root) => {
+    const track = root.querySelector<HTMLElement>('.carousel-track')!;
+    const slides = [...track.children] as HTMLElement[];
+    const dots = [...root.querySelectorAll<HTMLButtonElement>('.carousel-dot')];
+    const prev = root.querySelector<HTMLButtonElement>('.carousel-prev')!;
+    const next = root.querySelector<HTMLButtonElement>('.carousel-next')!;
+    const nextLabel = root.querySelector<HTMLElement>('.carousel-next-label');
+    let current = 0;
+
+
+    const show = (i: number) => {
+      current = i;
+      dots.forEach((d, n) => (n === i ? d.setAttribute('aria-current', 'true') : d.removeAttribute('aria-current')));
+      prev.disabled = i === 0;
+      next.disabled = i === slides.length - 1;
+      // Name the next case on the button, as a hint of what's coming
+      if (nextLabel) nextLabel.textContent = slides[i + 1] ? `Next: ${slides[i + 1].dataset.client}` : '';
+      // Only the visible slide's link is reachable by keyboard
+      slides.forEach((s, n) => s.toggleAttribute('inert', n !== i));
+    };
+
+    const goTo = (i: number) => {
+      const n = Math.max(0, Math.min(slides.length - 1, i));
+      track.scrollTo({ left: slides[n].offsetLeft - track.offsetLeft });
+      show(n); // update straight away, so quick repeated clicks keep counting
+    };
+
+    // Vertical wheel over the cards → one card sideways per gesture. Sideways trackpad
+    // swipes keep their native scrolling. A short lock swallows the trackpad's momentum,
+    // so one flick moves one card and doesn't spill over into page scrolling.
+    let wheelSum = 0;
+    let lockedUntil = 0;
+    track.addEventListener(
+      'wheel',
+      (e) => {
+        if (e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+        const now = performance.now();
+        const step = Math.sign(e.deltaY);
+        if (now < lockedUntil) {
+          e.preventDefault();
+          lockedUntil = Math.max(lockedUntil, now + 120);
+          return;
+        }
+        // Nothing more to show in this direction: let the page scroll
+        if ((step < 0 && current === 0) || (step > 0 && current === slides.length - 1)) {
+          wheelSum = 0;
+          return;
+        }
+        e.preventDefault();
+        wheelSum += e.deltaY;
+        if (Math.abs(wheelSum) >= 30) {
+          goTo(current + step);
+          wheelSum = 0;
+          lockedUntil = now + 450;
+        }
+      },
+      { passive: false },
+    );
+
+    prev.addEventListener('click', () => goTo(current - 1));
+    next.addEventListener('click', () => goTo(current + 1));
+    dots.forEach((d, n) => d.addEventListener('click', () => goTo(n)));
+
+    // The slide that is mostly in view is the current one
+    const io = new IntersectionObserver(
+      (entries) => {
+        // isIntersecting is also true for the peeking slide, so check how much is in view
+        entries.forEach((e) => e.intersectionRatio >= 0.6 && show(slides.indexOf(e.target as HTMLElement)));
+      },
+      { root: track, threshold: 0.6 },
+    );
+    slides.forEach((s) => io.observe(s));
+    show(0);
+  });
+</script>

@@ -1,0 +1,436 @@
+---
+// Home page hero with the liquid satin effect from explorations/liquid-landing.html.
+// The effect stays inside this section; the rest of the site keeps its plain background.
+// Colours come from the --color-liquid-* tokens. Without WebGL2 the section shows a
+// static gradient of the same colours. The bottom edge fades into the page background,
+// so the photo that overlaps it doesn't get cut by a hard line.
+---
+
+<section
+  class="liquid-hero relative isolate flex [--hero-fade:clamp(180px,30vh,320px)] [mask-image:linear-gradient(to_bottom,black_calc(100%-var(--hero-fade)),transparent)] min-h-[calc(100svh-var(--header-height))] flex-col justify-end overflow-hidden bg-liquid-mid bg-[linear-gradient(140deg,var(--color-liquid-deep),var(--color-liquid-light)_55%,var(--color-liquid-mid))] text-on-liquid"
+  aria-labelledby="positioning"
+>
+  <canvas class="liquid-canvas absolute inset-0 -z-10 size-full" aria-hidden="true"></canvas>
+  <div class="container-page pt-16 pb-[calc(var(--hero-fade)*0.6)]">
+    <slot />
+  </div>
+</section>
+
+<script>
+  type Settings = typeof SETTINGS;
+
+  // Tuned in the exploration's knobs panel ("Iris" preset). Colours are read from tokens.
+  const SETTINGS = {
+    contrast: 0.96, speed: 0.12, scale: 1.95, warp: 1.31, bands: 0.21, density: 26, sheen: 0.7, soft: 0.69,
+    force: 0.75, radius: 0.08, swirl: 4, glide: 0.92, memory: 0.989,
+    grain: 0.09, grainSize: 1.8, grainSpeed: 0.6,
+  };
+  // The liquid is soft by nature, so it renders at reduced resolution to keep laptops cool.
+  const QUALITY = 0.6;
+
+  const VERT = `#version 300 es
+  in vec2 p; out vec2 vUv;
+  void main(){ vUv = p*0.5+0.5; gl_Position = vec4(p,0.,1.); }`;
+
+  // ---- Fluid simulation (stable fluids, after Jos Stam / Pavel Dobryakov) ----
+  // Velocity is in "section heights per second". The liquid is not a dye: an OFFSET to
+  // the pattern's coordinates is advected, so the satin itself gets stirred.
+  const HEAD = `#version 300 es
+  precision highp float; precision highp sampler2D;
+  in vec2 vUv; out vec4 o;
+  uniform vec2 texel;
+  #define L(t) texture(t, vUv - vec2(texel.x, 0.))
+  #define R(t) texture(t, vUv + vec2(texel.x, 0.))
+  #define B(t) texture(t, vUv - vec2(0., texel.y))
+  #define T(t) texture(t, vUv + vec2(0., texel.y))
+  `;
+  // Pointer force along the whole segment since last frame, so fast strokes stay continuous
+  const SPLAT = HEAD + `
+  uniform sampler2D vel; uniform float aspect;
+  uniform vec2 a, b, force; uniform float radius;
+  void main(){
+    vec2 p = vUv * vec2(aspect, 1.);
+    vec2 pa = p - a, ba = b - a;
+    float h = clamp(dot(pa, ba) / max(dot(ba, ba), 1e-6), 0., 1.);
+    vec2 d = pa - ba * h;
+    float s = exp(-dot(d, d) / (radius * radius));
+    o = vec4(texture(vel, vUv).xy + force * s, 0., 1.);
+  }`;
+  const CURL = HEAD + `
+  uniform sampler2D vel;
+  void main(){ o = vec4(0.5 * (R(vel).y - L(vel).y - T(vel).x + B(vel).x), 0., 0., 1.); }`;
+  // Vorticity confinement: puts back the small swirls the coarse grid smears away
+  const VORT = HEAD + `
+  uniform sampler2D vel, curl; uniform float strength, dt;
+  void main(){
+    float c = texture(curl, vUv).x;
+    vec2 g = 0.5 * vec2(abs(T(curl).x) - abs(B(curl).x), abs(R(curl).x) - abs(L(curl).x));
+    float gl = length(g);
+    g = gl > 1e-3 ? g / gl : vec2(0.);
+    g *= strength * c * smoothstep(0.002, 0.02, abs(c)) * vec2(1., -1.);
+    vec2 v = texture(vel, vUv).xy + g * dt;
+    o = vec4(clamp(v, -6., 6.), 0., 1.);
+  }`;
+  const DIV = HEAD + `
+  uniform sampler2D vel;
+  void main(){
+    vec2 c = texture(vel, vUv).xy;
+    float l = L(vel).x, r = R(vel).x, b = B(vel).y, t = T(vel).y;
+    if (vUv.x - texel.x < 0.) l = -c.x;  if (vUv.x + texel.x > 1.) r = -c.x;
+    if (vUv.y - texel.y < 0.) b = -c.y;  if (vUv.y + texel.y > 1.) t = -c.y;
+    o = vec4(0.5 * (r - l + t - b), 0., 0., 1.);
+  }`;
+  const PRESS = HEAD + `
+  uniform sampler2D pressure, divergence; uniform float keep;
+  void main(){
+    float p = (L(pressure).x + R(pressure).x + B(pressure).x + T(pressure).x - texture(divergence, vUv).x) * 0.25;
+    o = vec4(p * keep, 0., 0., 1.);
+  }`;
+  const GRAD = HEAD + `
+  uniform sampler2D pressure, vel;
+  void main(){
+    vec2 v = texture(vel, vUv).xy - 0.5 * vec2(R(pressure).x - L(pressure).x, T(pressure).x - B(pressure).x);
+    o = vec4(v, 0., 1.);
+  }`;
+  // Semi-Lagrangian advection; the offset field relaxes toward zero so the satin slowly heals
+  const ADVECT = HEAD + `
+  uniform sampler2D vel, src; uniform float dt, aspect, keep, isOffset;
+  void main(){
+    vec2 back = vUv - texture(vel, vUv).xy * dt * vec2(1. / aspect, 1.);
+    vec2 v = texture(src, back).xy;
+    if (isOffset > 0.5) {
+      vec2 n = (texture(src, back + vec2(texel.x, 0.)).xy + texture(src, back - vec2(texel.x, 0.)).xy
+              + texture(src, back + vec2(0., texel.y)).xy + texture(src, back - vec2(0., texel.y)).xy) * 0.25;
+      v = mix(v, n, 0.12) + (back - vUv);
+    }
+    v *= keep;
+    if (isOffset < 0.5) v *= smoothstep(0.004, 0.02, length(v));
+    o = vec4(v, 0., 1.);
+  }`;
+
+  const RENDER = `#version 300 es
+  precision highp float;
+  in vec2 vUv; out vec4 o;
+  uniform sampler2D offset, vel; uniform float useField;
+  uniform vec2 res; uniform float time;
+  uniform vec3 c0, c1, c2, c3;
+  uniform float scale, warp, bands, density, sheen, soft, contrast;
+  uniform float grain, grainSize, grainTime;
+  uniform vec2 mouse;
+
+  vec2 hash2(vec2 p){ p = vec2(dot(p,vec2(127.1,311.7)), dot(p,vec2(269.5,183.3))); return -1.+2.*fract(sin(p)*43758.5453); }
+  float noise(vec2 p){
+    vec2 i = floor(p), f = fract(p), u = f*f*(3.-2.*f);
+    return mix(mix(dot(hash2(i), f), dot(hash2(i+vec2(1,0)), f-vec2(1,0)), u.x),
+               mix(dot(hash2(i+vec2(0,1)), f-vec2(0,1)), dot(hash2(i+vec2(1,1)), f-vec2(1,1)), u.x), u.y);
+  }
+  const mat2 R = mat2(0.8,0.6,-0.6,0.8);
+  float fbm(vec2 p, float fall){ float a=.5, s=0.; for(int i=0;i<4;i++){ s+=a*noise(p); p=R*p*2.02; a*=fall; } return s; }
+
+  // Domain-warped height field: the "liquid satin" surface
+  float surface(vec2 p, float t){
+    float fall = mix(0.5, 0.28, soft);
+    vec2 q = vec2(fbm(p + vec2(0.0, 0.12*t), 0.4), fbm(p + vec2(5.2, 1.3) - 0.1*t, 0.4));
+    vec2 r = vec2(fbm(p + warp*q + vec2(1.7, 9.2) + 0.15*t, 0.4), fbm(p + warp*q + vec2(8.3, 2.8) - 0.12*t, 0.4));
+    return fbm(p + warp*r, fall);
+  }
+  // Ribbons: fold the height into stripes, like the bands in poured satin
+  float shape(vec2 p, float t){
+    float h = surface(p, t);
+    float v = h*1.6 + 0.5;
+    float rib = sin(h * density) * 0.5 + 0.5;
+    rib = rib*rib*(3.-2.*rib);
+    v = mix(v, v*0.45 + rib*0.55, bands);
+    return (v - 0.5) * contrast + 0.5;
+  }
+  vec3 ramp(float v){
+    v = clamp(v,0.,1.);
+    vec3 c = mix(c0, c1, smoothstep(0.0, 0.42, v));
+    return mix(c, c2, smoothstep(0.38, 0.78, v));
+  }
+
+  void main(){
+    vec2 uv = vUv;
+    float aspect = res.x/res.y;
+    vec2 src = uv + (useField > 0.5 ? texture(offset, uv).xy : vec2(0.));
+    vec2 p = (src - 0.5) * vec2(aspect, 1.) * scale;
+    float stir = useField > 0.5 ? length(texture(vel, uv).xy) : 0.;
+
+    float e = 0.012;
+    float v  = shape(p, time);
+    float vx = shape(p + vec2(e,0.), time);
+    float vy = shape(p + vec2(0.,e), time);
+    float depth = mix(0.09, 0.035, soft);
+    vec3 nrm = normalize(vec3((v-vx)/e*depth, (v-vy)/e*depth, 1.));
+    vec3 col = ramp(v);
+
+    // glossy light from the upper left, plus a soft glow where the pointer is
+    vec3 L = normalize(vec3(-0.45, 0.55, 0.7));
+    float diff = clamp(dot(nrm, L), 0., 1.);
+    vec3 H = normalize(L + vec3(0,0,1));
+    float spec = pow(clamp(dot(nrm, H), 0., 1.), mix(70., 18., soft)) * (1. + min(stir, 1.5) * 0.6);
+    vec2 md = (uv - mouse) * vec2(aspect,1.);
+    float glow = exp(-dot(md,md) * 6.) * 0.25;
+    col *= mix(1., 0.75 + 0.45*diff, sheen*0.8);
+    col = mix(col, c3, clamp(spec * sheen * 1.2 + glow*sheen*smoothstep(0.4,1.,v), 0., 1.));
+
+    // film grain
+    vec2 gp = floor(gl_FragCoord.xy / grainSize);
+    float g = fract(sin(dot(gp + grainTime*vec2(17.31, 41.7), vec2(12.9898,78.233))) * 43758.5453) - 0.5;
+    col += g * grain;
+
+    // gentle vignette keeps the edges calm behind type
+    col *= 1. - 0.08*length((uv-0.5)*vec2(aspect,1.));
+    o = vec4(clamp(col,0.,1.), 1.);
+  }`;
+
+  function startLiquid(section: HTMLElement, canvas: HTMLCanvasElement, S: Settings) {
+    const gl = canvas.getContext('webgl2', { antialias: false, alpha: false, premultipliedAlpha: false });
+    if (!gl) return; // the section's CSS gradient stays as the fallback
+
+    const floatOK = !!gl.getExtension('EXT_color_buffer_float');
+    gl.getExtension('OES_texture_float_linear');
+
+    // Colours come from the tokens. The stylesheet can arrive after this script (dev mode),
+    // so keep trying each frame until all four are defined.
+    const TOKENS = ['--color-liquid-deep', '--color-liquid-mid', '--color-liquid-light', '--color-liquid-shine'];
+    let C: number[][] | null = null;
+    function readColors() {
+      const css = getComputedStyle(document.documentElement);
+      const values = TOKENS.map((name) => css.getPropertyValue(name).trim());
+      if (values.some((v) => !v)) return null;
+      return values.map((value) => {
+        const probe = document.createElement('span');
+        probe.style.color = value;
+        document.body.append(probe);
+        const [r, g, b] = getComputedStyle(probe).color.match(/[\d.]+/g)!.map(Number);
+        probe.remove();
+        return [r / 255, g / 255, b / 255];
+      });
+    }
+
+    type Prog = { pr: WebGLProgram; u: Record<string, WebGLUniformLocation | null> };
+    function compile(type: number, src: string) {
+      const s = gl!.createShader(type)!;
+      gl!.shaderSource(s, src);
+      gl!.compileShader(s);
+      if (!gl!.getShaderParameter(s, gl!.COMPILE_STATUS)) throw new Error(gl!.getShaderInfoLog(s) ?? 'shader');
+      return s;
+    }
+    function program(fs: string): Prog {
+      const pr = gl!.createProgram()!;
+      gl!.attachShader(pr, compile(gl!.VERTEX_SHADER, VERT));
+      gl!.attachShader(pr, compile(gl!.FRAGMENT_SHADER, fs));
+      gl!.bindAttribLocation(pr, 0, 'p');
+      gl!.linkProgram(pr);
+      if (!gl!.getProgramParameter(pr, gl!.LINK_STATUS)) throw new Error(gl!.getProgramInfoLog(pr) ?? 'program');
+      const u: Prog['u'] = {};
+      const n = gl!.getProgramParameter(pr, gl!.ACTIVE_UNIFORMS);
+      for (let i = 0; i < n; i++) {
+        const name = gl!.getActiveUniform(pr, i)!.name;
+        u[name] = gl!.getUniformLocation(pr, name);
+      }
+      return { pr, u };
+    }
+    const P = floatOK
+      ? { splat: program(SPLAT), curl: program(CURL), vort: program(VORT), div: program(DIV), press: program(PRESS), grad: program(GRAD), advect: program(ADVECT) }
+      : null;
+    const renP = program(RENDER);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+    // Fluid grid: velocity and offset ping-pong, plus scratch targets
+    type Target = { tex: WebGLTexture; fb: WebGLFramebuffer };
+    type Pair = { a: Target; b: Target; swap: () => void };
+    let F: { vel: Pair; off: Pair; press: Pair; curl: Target; div: Target } | null = null;
+    let simW = 0;
+    let simH = 0;
+    function makeTarget(w: number, h: number): Target {
+      const tex = gl!.createTexture()!;
+      gl!.bindTexture(gl!.TEXTURE_2D, tex);
+      gl!.texImage2D(gl!.TEXTURE_2D, 0, gl!.RGBA16F, w, h, 0, gl!.RGBA, gl!.HALF_FLOAT, null);
+      gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MIN_FILTER, gl!.LINEAR);
+      gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MAG_FILTER, gl!.LINEAR);
+      gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_S, gl!.CLAMP_TO_EDGE);
+      gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_T, gl!.CLAMP_TO_EDGE);
+      const fb = gl!.createFramebuffer()!;
+      gl!.bindFramebuffer(gl!.FRAMEBUFFER, fb);
+      gl!.framebufferTexture2D(gl!.FRAMEBUFFER, gl!.COLOR_ATTACHMENT0, gl!.TEXTURE_2D, tex, 0);
+      gl!.clearColor(0, 0, 0, 0);
+      gl!.clear(gl!.COLOR_BUFFER_BIT);
+      return { tex, fb };
+    }
+    const pair = (w: number, h: number): Pair => {
+      const p = { a: makeTarget(w, h), b: makeTarget(w, h), swap: () => ([p.a, p.b] = [p.b, p.a]) };
+      return p;
+    };
+    function buildFluid(w: number, h: number) {
+      if (F) for (const t of [F.vel.a, F.vel.b, F.off.a, F.off.b, F.press.a, F.press.b, F.curl, F.div]) { gl!.deleteTexture(t.tex); gl!.deleteFramebuffer(t.fb); }
+      F = { vel: pair(w, h), off: pair(w, h), press: pair(w, h), curl: makeTarget(w, h), div: makeTarget(w, h) };
+      simW = w;
+      simH = h;
+    }
+    function pass(prog: Prog, target: Target, tex: Record<string, Target>, uni: Record<string, number | number[]> = {}) {
+      gl!.useProgram(prog.pr);
+      gl!.bindFramebuffer(gl!.FRAMEBUFFER, target.fb);
+      gl!.viewport(0, 0, simW, simH);
+      let unit = 0;
+      for (const [name, t] of Object.entries(tex)) {
+        gl!.activeTexture(gl!.TEXTURE0 + unit);
+        gl!.bindTexture(gl!.TEXTURE_2D, t.tex);
+        gl!.uniform1i(prog.u[name], unit++);
+      }
+      gl!.uniform2f(prog.u.texel, 1 / simW, 1 / simH);
+      for (const [name, v] of Object.entries(uni)) {
+        const loc = prog.u[name];
+        if (!loc) continue;
+        Array.isArray(v) ? gl!.uniform2f(loc, v[0], v[1]) : gl!.uniform1f(loc, v);
+      }
+      gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4);
+    }
+
+    // Size everything to the hero section, not the window
+    let boxW = 1;
+    let boxH = 1;
+    function resize() {
+      const r = section.getBoundingClientRect();
+      boxW = Math.max(1, r.width);
+      boxH = Math.max(1, r.height);
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      const w = Math.round(boxW * dpr * QUALITY);
+      const h = Math.round(boxH * dpr * QUALITY);
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+      }
+      if (floatOK) {
+        const sh = 180;
+        const sw = Math.round((sh * boxW) / boxH);
+        if (sw !== simW || sh !== simH) buildFluid(sw, sh);
+      }
+    }
+    new ResizeObserver(resize).observe(section);
+    resize();
+
+    // Pointer, in "aspect space" of the section: x in [0, aspect], y in [0, 1], y up
+    const ptr = { x: 0, y: 0, lx: 0, ly: 0, has: false, moved: false, sx: 0.5, sy: 0.5 };
+    function onMove(cx: number, cy: number) {
+      const r = section.getBoundingClientRect();
+      const x = (cx - r.left) / r.height;
+      const y = 1 - (cy - r.top) / r.height;
+      if (!ptr.has) { ptr.lx = x; ptr.ly = y; ptr.has = true; }
+      ptr.x = x;
+      ptr.y = y;
+      ptr.moved = true;
+    }
+    section.addEventListener('pointermove', (e) => onMove(e.clientX, e.clientY), { passive: true });
+    section.addEventListener('pointerleave', () => (ptr.has = false));
+    section.addEventListener('touchstart', (e) => { ptr.has = false; const t = e.touches[0]; if (t) onMove(t.clientX, t.clientY); }, { passive: true });
+    section.addEventListener('touchmove', (e) => { const t = e.touches[0]; if (t) onMove(t.clientX, t.clientY); }, { passive: true });
+
+    // Only animate while the hero is on screen and the tab is visible
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    let onScreen = true;
+    let running = false;
+    let time = Math.random() * 50;
+    let grainClock = 0;
+    let last = performance.now();
+    const wake = () => {
+      const should = onScreen && !document.hidden;
+      if (should && !running) { running = true; last = performance.now(); requestAnimationFrame(frame); }
+      if (!should) running = false;
+    };
+    new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; wake(); }).observe(section);
+    document.addEventListener('visibilitychange', wake);
+
+    function frame(now: number) {
+      if (!running) return;
+      C ??= readColors();
+      if (!C) {
+        requestAnimationFrame(frame);
+        return;
+      }
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      const motion = reduceMotion.matches ? 0.08 : 1;
+      time += dt * S.speed * motion;
+      grainClock += dt * S.grainSpeed * 24 * (reduceMotion.matches ? 0 : 1);
+      const aspect = boxW / boxH;
+
+      if (ptr.has) {
+        ptr.sx += (ptr.x / aspect - ptr.sx) * Math.min(1, dt * 6);
+        ptr.sy += (ptr.y - ptr.sy) * Math.min(1, dt * 6);
+      }
+
+      if (P && F) {
+        const f60 = dt * 60;
+        if (ptr.moved && ptr.has && dt > 0) {
+          let vx = (ptr.x - ptr.lx) / dt;
+          let vy = (ptr.y - ptr.ly) / dt;
+          const sp = Math.hypot(vx, vy);
+          if (sp > 4) { vx *= 4 / sp; vy *= 4 / sp; }
+          const k = S.force * motion;
+          pass(P.splat, F.vel.b, { vel: F.vel.a }, { aspect, a: [ptr.lx, ptr.ly], b: [ptr.x, ptr.y], force: [vx * k, vy * k], radius: S.radius });
+          F.vel.swap();
+        }
+        ptr.lx = ptr.x;
+        ptr.ly = ptr.y;
+        ptr.moved = false;
+
+        pass(P.curl, F.curl, { vel: F.vel.a });
+        pass(P.vort, F.vel.b, { vel: F.vel.a, curl: F.curl }, { strength: S.swirl, dt });
+        F.vel.swap();
+        pass(P.div, F.div, { vel: F.vel.a });
+        pass(P.press, F.press.b, { pressure: F.press.a, divergence: F.div }, { keep: 0.8 });
+        F.press.swap();
+        for (let i = 0; i < 20; i++) {
+          pass(P.press, F.press.b, { pressure: F.press.a, divergence: F.div }, { keep: 1 });
+          F.press.swap();
+        }
+        pass(P.grad, F.vel.b, { pressure: F.press.a, vel: F.vel.a });
+        F.vel.swap();
+        pass(P.advect, F.vel.b, { vel: F.vel.a, src: F.vel.a }, { dt, aspect, keep: Math.pow(S.glide, f60), isOffset: 0 });
+        F.vel.swap();
+        pass(P.advect, F.off.b, { vel: F.vel.a, src: F.off.a }, { dt, aspect, keep: Math.pow(S.memory, f60), isOffset: 1 });
+        F.off.swap();
+      }
+
+      const u = renP.u;
+      gl!.useProgram(renP.pr);
+      gl!.bindFramebuffer(gl!.FRAMEBUFFER, null);
+      gl!.viewport(0, 0, canvas.width, canvas.height);
+      if (F) {
+        gl!.activeTexture(gl!.TEXTURE0); gl!.bindTexture(gl!.TEXTURE_2D, F.off.a.tex); gl!.uniform1i(u.offset, 0);
+        gl!.activeTexture(gl!.TEXTURE1); gl!.bindTexture(gl!.TEXTURE_2D, F.vel.a.tex); gl!.uniform1i(u.vel, 1);
+      }
+      gl!.uniform1f(u.useField, F ? 1 : 0);
+      gl!.uniform2f(u.res, canvas.width, canvas.height);
+      gl!.uniform1f(u.time, time);
+      gl!.uniform3fv(u.c0, C[0]); gl!.uniform3fv(u.c1, C[1]); gl!.uniform3fv(u.c2, C[2]); gl!.uniform3fv(u.c3, C[3]);
+      gl!.uniform1f(u.scale, S.scale); gl!.uniform1f(u.warp, S.warp);
+      gl!.uniform1f(u.bands, S.bands); gl!.uniform1f(u.density, S.density); gl!.uniform1f(u.sheen, S.sheen);
+      gl!.uniform1f(u.soft, S.soft); gl!.uniform1f(u.contrast, S.contrast);
+      gl!.uniform1f(u.grain, S.grain);
+      gl!.uniform1f(u.grainSize, S.grainSize * QUALITY);
+      gl!.uniform1f(u.grainTime, Math.floor(grainClock));
+      gl!.uniform2f(u.mouse, ptr.sx, ptr.sy);
+      gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4);
+
+      requestAnimationFrame(frame);
+    }
+    wake();
+  }
+
+  document.querySelectorAll<HTMLElement>('.liquid-hero').forEach((section) => {
+    const canvas = section.querySelector<HTMLCanvasElement>('.liquid-canvas');
+    if (!canvas) return;
+    try {
+      startLiquid(section, canvas, SETTINGS);
+    } catch {
+      canvas.remove(); // shader failed: keep the CSS gradient
+    }
+  });
+</script>

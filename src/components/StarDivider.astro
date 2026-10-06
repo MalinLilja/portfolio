@@ -1,13 +1,11 @@
 ---
-// The row of four-point stars from the CV, portfolio and colour scheme, used between sections.
+// The row of small four-point stars from the CV and portfolio, used between sections.
 interface Props {
-  /** Bigger, wider-spaced stars, as in the home page hero */
-  large?: boolean;
   class?: string;
 }
-const { large = false, class: className } = Astro.props;
-const [w, h] = large ? [58, 28] : [22, 12];
-const star = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}' viewBox='0 0 ${w} ${h}'%3E%3Cpath transform='scale(${h / 12})' d='M6 0 C6.6 4.2 7.8 5.4 12 6 C7.8 6.6 6.6 7.8 6 12 C5.4 7.8 4.2 6.6 0 6 C4.2 5.4 5.4 4.2 6 0Z'/%3E%3C/svg%3E") repeat-x left center / ${w}px ${h}px`;
+const { class: className } = Astro.props;
+const star =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='12' viewBox='0 0 22 12'%3E%3Cpath d='M6 0 C6.6 4.2 7.8 5.4 12 6 C7.8 6.6 6.6 7.8 6 12 C5.4 7.8 4.2 6.6 0 6 C4.2 5.4 5.4 4.2 6 0Z'/%3E%3C/svg%3E\") repeat-x left center / 22px 12px";
 ---
 
-<div class:list={['bg-stars', large ? 'h-7' : 'h-3', className]} style={`mask: ${star}`} aria-hidden="true"></div>
+<div class:list={['h-3 bg-stars', className]} style={`mask: ${star}`} aria-hidden="true"></div>

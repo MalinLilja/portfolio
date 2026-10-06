@@ -3,10 +3,13 @@ title: Helping shipping companies order the most profitable speed
 client: SmartOpt
 order: 2
 accent: smartopt
-theme: dark
 summary: A fuel optimization app for shipping, from pre-study to launch.
 description: How Malin Lilja took SmartOpt, a fuel optimization app for the freight industry, from pre-study to launch as product designer and product owner.
 tags: [Product design, Product ownership, Service design, via Amply]
+# Badges on the home page card: your role on the project
+roles: [Product designer, Product owner]
+# Big tile in the summary bento: why the project existed (draft by Claude, rewrite freely)
+purpose: "Turn an expert calculation method into an app that helps shipping teams order the most profitable speed."
 hero: ./planned-voyages.jpg
 heroAlt: SmartOpt's planned voyages view, a dark dashboard listing upcoming voyages with their optimal speed and fuel figures.
 tldr:
