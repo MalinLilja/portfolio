@@ -15,7 +15,7 @@ heroAlt: Four Ziklo RVE screens on a dark background - a car model's score break
 tldr:
   company: Ziklo, The Mobility Bank, a car financing and leasing bank
   role: Product designer
-  timeline: "[years]"
+  timeline: "2025"
   problem: Ziklo had built a tool for setting cars' residual values, but it didn't match how the team actually worked, and it hadn't been adopted.
   whatIDid: Mapped the real valuation process with users, adapted the existing tool to it within the technical constraints, and supported the rollout.
   result: "[Add adoption, e.g. the team now runs its valuation process in the tool.]"
@@ -23,19 +23,15 @@ tldr:
 
 ## The problem
 
-A car's residual value is what it's expected to be worth at the end of a lease. Getting it right matters for a financing bank. Ziklo RVE supports the analysis and decisions, and suggests new values by scoring each car model automatically.
+A car's residual value is what it's expected to be worth at the end of a lease. Getting it right matters for a financing bank.
 
-The application already existed when I joined, but it was built before anyone had looked closely at the users' process. People weren't using it.
+Ziklo RVE is a tool that helps with keeping correct and updated residual values for Ziklo. It's partly a system to support the process of analyzing and deciding on residual values, but it also helps to suggest new residual values by giving an automatic score to the cars.
 
 ![A car model's score breakdown: a 52% residual value suggestion and a waterfall chart of the factors behind the total score.](./score-breakdown.jpg "Each car model gets an automatic score and a suggested residual value")
 
 ## Designing for the real process
 
-I couldn't start from scratch, so I worked within the constraints already in place.
-
-- I researched how the team analysed and decided on residual values, and mapped the user journey.
-- I iterated the journey and the design with the intended users.
-- I wrote the specifications and handed them over for implementation.
+When I joined the project there was already an application in place that had yet to face user adoption. My role in the project was to research and develop the users' process and adapt the current application to it, given the constraints that were already in place. I mapped out the user journey, iterated it with the intended users and designed the specifications to hand over for implementation.
 
 The result follows the team's own workflow. The project board moves each car model through three stages: residual value analysis, the residual value council and decision, and activation.
 
@@ -43,7 +39,7 @@ The result follows the team's own workflow. The project board moves each car mod
 
 ## Supporting adoption
 
-During rollout, I helped with testing and user guidance, and acted as the users' advocate in the project team.
+During the adoption phase of the project I assisted with testing and user guidance, acting as an advocate for the users.
 
 ## Outcome
 
