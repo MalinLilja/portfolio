@@ -15,7 +15,7 @@ heroAlt: SmartOpt's planned voyages view, a dark dashboard listing upcoming voya
 tldr:
   company: Optimum Earnings, freight and shipping industry
   role: Product designer and product owner
-  timeline: "[years]"
+  timeline: 2024, about 600 hours for the full team
   problem: Ships are often ordered to sail at a speed and fuel use that is far from optimal, because no one can weigh all the factors that affect earnings.
   whatIDid: Led a pre-study that turned an expert calculation method into an app concept, then owned the design and roadmap through to launch.
   result: SmartOpt launched to customers and is live at smartopt.se. [Add customers or usage if you can.]
