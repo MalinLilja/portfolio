@@ -15,6 +15,7 @@ roles: [Senior UX designer, Design lead]
 # Big tile in the summary bento: why the project existed (from the slides)
 purpose: "Bring crewing and bidding into one planning platform, replacing a legacy system and disconnected spreadsheets."
 hero: ./all-crews.webp
+logo: ./logo.png
 heroAlt: A dark timeline view of all crews, with shows as coloured bars from April 2026 to February 2027, FX supervisor slots under each show, and a list of people below. Names are masked.
 tldr:
   company: ILP VFX, one of Scandinavia's largest VFX and animation studios (200+ people)

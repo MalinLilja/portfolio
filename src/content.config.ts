@@ -29,6 +29,8 @@ const work = defineCollection({
       // Big tile in the summary bento: why the project existed
       purpose: z.string().optional(),
       hero: image(),
+      // Small round company logo next to the client name on the home page card (square works best)
+      logo: image().optional(),
       heroAlt: z.string(),
       tldr: z.object({
         company: z.string(),

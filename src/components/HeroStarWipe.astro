@@ -37,6 +37,12 @@
     let frame = 0;
     let last = 0;
 
+    // Tells the rest of the page how dark the hero is (0–1); the liquid pauses once it is covered
+    const announce = (value = p) => {
+      (window as unknown as { heroWipe?: number }).heroWipe = value;
+      window.dispatchEvent(new CustomEvent('hero-wipe', { detail: value }));
+    };
+
     const render = () => {
       if (reduceMotion.matches) {
         star.style.transform = '';
@@ -44,6 +50,7 @@
         stage.style.removeProperty('--wipe-text');
         stage.style.removeProperty('--wipe-intro');
         if (photo) photo.style.opacity = '';
+        announce(1);
         return;
       }
       // Big enough that the star's narrow waist covers the far corner of the hero
@@ -63,6 +70,7 @@
       lead?.classList.toggle('is-shown', intro > 0.5);
       // The part of the photo that hangs below the hero isn't under the star, so fade it out
       if (photo) photo.style.opacity = String(1 - covered);
+      announce();
     };
 
     const step = (now: number) => {

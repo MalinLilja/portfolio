@@ -4,7 +4,7 @@ import Base from '../layouts/Base.astro';
 import LiquidHero from '../components/LiquidHero.astro';
 import HeroPhoto from '../components/HeroPhoto.astro';
 import HeroStarWipe from '../components/HeroStarWipe.astro';
-import Sketchbook from '../components/Sketchbook.astro';
+import CaseCards from '../components/CaseCards.astro';
 import Practice from '../components/Practice.astro';
 import ConnectTheDots from '../components/ConnectTheDots.astro';
 import ExperienceStrip from '../components/ExperienceStrip.astro';
@@ -33,13 +33,18 @@ const work = [
   ...(home.data.comingSoon ?? []).map((c) => ({ client: c.client, company: c.company, purpose: c.purpose, note: c.note, roles: c.roles ?? [] })),
   ...cases.map((c) => ({
     client: c.data.client,
-    company: c.data.tldr.company,
+    title: c.data.title,
     purpose: c.data.purpose,
+    timeline: c.data.tldr.timeline,
+    problem: c.data.tldr.problem,
+    whatIDid: c.data.tldr.whatIDid,
+    result: c.data.tldr.result,
     roles: c.data.roles ?? [],
     href: `/work/${c.id}`,
     accent: c.data.accent,
     image: c.data.hero,
     imageAlt: c.data.heroAlt,
+    logo: c.data.logo,
   })),
 ];
 ---
@@ -71,7 +76,7 @@ const work = [
         (--wipe-intro, 0 → 1). Only in the animated version; otherwise it stays in the intro below. */}
     <div class="pointer-events-none absolute inset-0 z-30 hidden items-center opacity-(--wipe-intro,0) lg:items-start lg:pt-[14svh] js:motion-safe:flex [&.is-shown]:pointer-events-auto" data-hero-lead>
       <div class="container-page">
-        <div class="mx-auto grid max-w-[60ch] gap-4 text-center font-headline text-18 leading-snug font-medium text-balance text-text md:max-w-[44%]">
+        <div class="grid max-w-[60ch] gap-4 font-headline text-18 leading-snug font-medium text-text md:max-w-[44%]">
           {leadSentences.map((sentence) => <p>{sentence}</p>)}
         </div>
       </div>
@@ -82,30 +87,11 @@ const work = [
   <div class="container-page">
     {home.data.journey && !home.data.journey.hidden && <ConnectTheDots {...home.data.journey} />}
 
-    {/* With the animated hero on wide screens, the sketchbook is pulled up so it lies over the
-         bottom of the dark hero, beside the "I care…" text */}
-    <section id="work" class="relative z-40 pt-[clamp(48px,10vh,120px)] lg:js:motion-safe:-mt-[34svh] lg:js:motion-safe:pt-0" aria-labelledby="work-heading">
-      {/* Not shown, but names the sketchbook for screen readers */}
+    <section id="work" class="pt-[clamp(48px,10vh,120px)]" aria-labelledby="work-heading">
+      {/* Not shown, but names the cases for screen readers */}
       <h2 id="work-heading" class="sr-only">Selected work</h2>
-      <Sketchbook items={work} labelledby="work-heading" />
+      <CaseCards items={work} />
     </section>
-
-    <!-- Intro, under Selected work. Kept to the left. -->
-    <section class="pt-24" aria-labelledby="about-heading">
-      <h2 id="about-heading" class="sr-only">About me</h2>
-      {/* In the animated version the first paragraph is shown on the dark hero instead (above) */}
-      <div class="max-w-[60ch] text-text-muted md:max-w-[48%] [&_p:first-child]:font-headline [&_p:first-child]:text-22 [&_p:first-child]:leading-snug [&_p:first-child]:font-medium [&_p:first-child]:text-text js:motion-safe:[&_p:first-child]:hidden [&_p+p]:mt-6">
-        <Intro />
-      </div>
-    </section>
-
-    {home.data.practice && !home.data.practice.hidden && <Practice {...home.data.practice} />}
-
-    <StarDivider class="mt-24" />
-
-    <div class="mt-16 lg:max-w-[calc(7/12*100%)]">
-      <ExperienceStrip items={experience} />
-    </div>
 
     {
       testimonials.length > 0 && (
@@ -123,5 +109,23 @@ const work = [
         </section>
       )
     }
+
+    <!-- Intro, under the testimonials. Kept to the left. -->
+    <section class="pt-24" aria-labelledby="about-heading">
+      <h2 id="about-heading" class="sr-only">About me</h2>
+      {/* In the animated version the first paragraph is shown on the dark hero instead (above) */}
+      <div class="max-w-[60ch] text-text-muted md:max-w-[48%] [&_p:first-child]:font-headline [&_p:first-child]:text-22 [&_p:first-child]:leading-snug [&_p:first-child]:font-medium [&_p:first-child]:text-text js:motion-safe:[&_p:first-child]:hidden [&_p+p]:mt-6">
+        <Intro />
+      </div>
+    </section>
+
+    {home.data.practice && !home.data.practice.hidden && <Practice {...home.data.practice} />}
+
+    <StarDivider class="mt-24" />
+
+    <div class="mt-16 lg:max-w-[calc(7/12*100%)]">
+      <ExperienceStrip items={experience} />
+    </div>
+
   </div>
 </Base>

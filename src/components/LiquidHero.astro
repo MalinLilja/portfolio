@@ -6,6 +6,8 @@
 // so the photo that overlaps it doesn't get cut by a hard line.
 // The liquid is its own layer and the text sits on z-30, so on the home page the photo
 // (z-10) and the star transition (z-20) can go between them (see index.astro).
+// The mouse stirs it (a small fluid simulation). It pauses when it's off screen, the tab is
+// hidden, or the star transition has covered it, so it costs nothing while it can't be seen.
 ---
 
 <section
@@ -28,7 +30,7 @@
 
   // Tuned in the exploration's knobs panel ("Iris" preset). Colours are read from tokens.
   const SETTINGS = {
-    contrast: 0.96, speed: 0.12, scale: 1.95, warp: 1.31, bands: 0.21, density: 26, sheen: 0.7, soft: 0.69,
+    contrast: 0.96, speed: 0.24, scale: 1.95, warp: 1.31, bands: 0.21, density: 26, sheen: 0.7, soft: 0.69,
     force: 0.75, radius: 0.08, swirl: 4, glide: 0.92, memory: 0.989,
     grain: 0.09, grainSize: 1.8, grainSpeed: 0.6,
   };
@@ -338,20 +340,26 @@
     section.addEventListener('touchstart', (e) => { ptr.has = false; const t = e.touches[0]; if (t) onMove(t.clientX, t.clientY); }, { passive: true });
     section.addEventListener('touchmove', (e) => { const t = e.touches[0]; if (t) onMove(t.clientX, t.clientY); }, { passive: true });
 
-    // Only animate while the hero is on screen and the tab is visible
+    // Only animate while the liquid can be seen: on screen, tab visible, and not covered by
+    // the star transition (HeroStarWipe announces how dark the hero is as "hero-wipe")
     const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
     let onScreen = true;
+    let covered = ((window as unknown as { heroWipe?: number }).heroWipe ?? 0) >= 1;
     let running = false;
     let time = Math.random() * 50;
     let grainClock = 0;
     let last = performance.now();
     const wake = () => {
-      const should = onScreen && !document.hidden;
+      const should = onScreen && !covered && !document.hidden;
       if (should && !running) { running = true; last = performance.now(); requestAnimationFrame(frame); }
       if (!should) running = false;
     };
     new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; wake(); }).observe(section);
     document.addEventListener('visibilitychange', wake);
+    window.addEventListener('hero-wipe', (e) => {
+      covered = (e as CustomEvent<number>).detail >= 1;
+      wake();
+    });
 
     function frame(now: number) {
       if (!running) return;
