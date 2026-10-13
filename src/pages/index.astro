@@ -4,7 +4,9 @@ import Base from '../layouts/Base.astro';
 import LiquidHero from '../components/LiquidHero.astro';
 import HeroPhoto from '../components/HeroPhoto.astro';
 import HeroStarWipe from '../components/HeroStarWipe.astro';
+import PositioningLine from '../components/PositioningLine.astro';
 import CaseCards from '../components/CaseCards.astro';
+import CaseDeck from '../components/CaseDeck.astro';
 import Practice from '../components/Practice.astro';
 import ConnectTheDots from '../components/ConnectTheDots.astro';
 import ExperienceStrip from '../components/ExperienceStrip.astro';
@@ -57,8 +59,12 @@ const work = [
   <!-- Hero stage: with JavaScript and motion allowed, a little scroll makes a star from the
        corner grow until the hero is dark, while the hero stays pinned briefly (see HeroStarWipe).
        The hero text fades out and the intro's first paragraph fades in on the dark screen.
+       On wide screens the dark screen also shows the case card deck (CaseDeck).
        The photo overlaps the hero's bottom edge, so it sits outside the hero's clipping. -->
-  <div class="relative js:motion-safe:h-[calc(100svh-var(--header-height)+var(--wipe-travel))] [--wipe-travel:30svh]" data-hero-stage>
+  <div
+    class="relative overflow-x-clip js:motion-safe:h-[calc(100svh-var(--header-height)+var(--wipe-travel))] [--wipe-travel:30svh]"
+    data-hero-stage
+  >
     <div class="relative js:motion-safe:sticky js:motion-safe:top-(--header-height)">
     <LiquidHero>
       {/* Fades out as the star covers the hero (--wipe-text, 0 → 1) */}
@@ -66,7 +72,9 @@ const work = [
       <p class="mt-5 font-display text-hero leading-[0.92] font-name uppercase opacity-[calc(1-var(--wipe-text,0))]">
         {profile.name.split(' ').map((part) => <span class="block">{part}</span>)}
       </p>
-      <h1 id="positioning" class="mt-[clamp(28px,5vh,56px)] max-w-[18ch] font-headline text-32 leading-[1.15] font-medium tracking-normal opacity-[calc(1-var(--wipe-text,0))]">{home.data.positioning}</h1>
+      <h1 id="positioning" class="mt-[clamp(28px,5vh,56px)] max-w-[32ch] font-headline text-32 leading-[1.15] font-medium tracking-normal opacity-[calc(1-var(--wipe-text,0))]">
+        <PositioningLine text={home.data.positioning!} phrase={home.data.positioningCycle?.phrase} options={home.data.positioningCycle?.options} />
+      </h1>
       {/* Room for the photo on phones, where it sits under the text */}
       {home.data.photo && <div class="h-44 md:hidden" aria-hidden="true" />}
     </LiquidHero>
@@ -74,23 +82,28 @@ const work = [
     <HeroStarWipe />
     {/* The intro's first paragraph, shown on the dark hero once the star has covered it
         (--wipe-intro, 0 → 1). Only in the animated version; otherwise it stays in the intro below. */}
-    <div class="pointer-events-none absolute inset-0 z-30 hidden items-center opacity-(--wipe-intro,0) lg:items-start lg:pt-[14svh] js:motion-safe:flex [&.is-shown]:pointer-events-auto" data-hero-lead>
+    <div class="pointer-events-none absolute inset-0 z-30 hidden items-center opacity-(--wipe-intro,0) js:motion-safe:flex [&.is-shown]:pointer-events-auto" data-hero-lead>
       <div class="container-page">
-        <div class="grid max-w-[60ch] gap-4 font-headline text-18 leading-snug font-medium text-text md:max-w-[44%]">
+        {/* The first sentence leads in white; the rest are light and muted */}
+        <div class="grid max-w-[60ch] gap-4 font-headline text-18 leading-snug font-light text-text-muted md:max-w-[44%] lg:max-w-[20rem] [&>p:first-child]:font-medium [&>p:first-child]:text-text">
           {leadSentences.map((sentence) => <p>{sentence}</p>)}
         </div>
       </div>
     </div>
+    <CaseDeck items={work} />
     </div>
   </div>
 
   <div class="container-page">
     {home.data.journey && !home.data.journey.hidden && <ConnectTheDots {...home.data.journey} />}
 
-    <section id="work" class="pt-[clamp(48px,10vh,120px)]" aria-labelledby="work-heading">
+    <section id="work" class="pt-[clamp(48px,10vh,120px)] lg:js:motion-safe:pt-0" aria-labelledby="work-heading">
       {/* Not shown, but names the cases for screen readers */}
       <h2 id="work-heading" class="sr-only">Selected work</h2>
-      <CaseCards items={work} />
+      {/* On wide screens with motion the cases are the deck on the dark hero instead */}
+      <div class="lg:js:motion-safe:hidden">
+        <CaseCards items={work} />
+      </div>
     </section>
 
     {

@@ -57,6 +57,9 @@ const site = defineCollection({
     title: z.string().optional(),
     description: z.string().optional(),
     positioning: z.string().optional(),
+    // A phrase in the positioning line that visitors can click to see other things you
+    // design for, one at a time
+    positioningCycle: z.object({ phrase: z.string(), options: z.array(z.string()) }).optional(),
     email: z.string().email().optional(),
     phone: z.string().optional(),
     linkedin: z.string().url().optional(),

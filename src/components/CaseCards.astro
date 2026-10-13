@@ -1,33 +1,11 @@
 ---
-// Selected work as clear, focused cards, one per case, stacked: the case picture, then
-// company and timeline, the case title, its purpose, and three short parts (challenge,
-// what I did, result) from the case's summary, with role badges and a link to the case.
-// The whole card is clickable (the title link stretches over it). Parts that are still
-// [gaps] are left out.
-import { Image } from 'astro:assets';
-import type { ImageMetadata } from 'astro';
-import RoleBadges from './RoleBadges.astro';
-import { hideGaps } from '../lib/brackets';
-
-interface Item {
-  client: string;
-  title?: string;
-  purpose?: string;
-  timeline?: string;
-  problem?: string;
-  whatIDid?: string;
-  result?: string;
-  roles: string[];
-  href?: string;
-  note?: string;
-  accent?: string;
-  image?: ImageMetadata;
-  imageAlt?: string;
-  logo?: ImageMetadata;
-}
+// Selected work as clear, focused cards, one per case, stacked (see CaseCard). This is the
+// version for phones, tablets, reduced motion and no JavaScript; on wide screens with
+// motion the cases are shown as the card deck on the dark hero instead (CaseDeck).
+import CaseCard, { type CaseItem } from './CaseCard.astro';
 
 interface Props {
-  items: Item[];
+  items: CaseItem[];
 }
 
 const { items } = Astro.props;
@@ -35,88 +13,10 @@ const { items } = Astro.props;
 
 <ol class="grid gap-6 md:gap-8">
   {
-    items.map((item, i) => {
-      const parts = [
-        { label: 'Challenge', text: hideGaps(item.problem) },
-        { label: 'What I did', text: hideGaps(item.whatIDid) },
-        { label: 'Result', text: hideGaps(item.result) },
-      ].filter((part) => part.text);
-      const timeline = hideGaps(item.timeline);
-      const purpose = hideGaps(item.purpose);
-      return (
-        <li data-case={item.accent}>
-          <article
-            class:list={[
-              'group relative grid overflow-hidden rounded-media border bg-surface lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]',
-              item.href
-                ? 'border-border transition-colors duration-160 ease-out hover:border-case-accent focus-within:border-case-accent'
-                : 'border-dashed border-stars',
-            ]}
-          >
-            <div class="aspect-16/10 overflow-hidden border-b border-border bg-bg lg:aspect-auto lg:min-h-[28rem] lg:border-r lg:border-b-0">
-              {item.image ? (
-                <Image
-                  src={item.image}
-                  alt={item.imageAlt ?? ''}
-                  widths={[480, 720, 1080, 1440]}
-                  sizes="(min-width: 1248px) 700px, (min-width: 1080px) 58vw, 100vw"
-                  loading={i === 0 ? 'eager' : 'lazy'}
-                  class="h-full! w-full! max-w-none! object-cover object-left-top transition-transform duration-600 ease-out group-hover:scale-[1.02]"
-                />
-              ) : (
-                <div class="grid size-full place-items-center bg-[linear-gradient(140deg,var(--color-liquid-deep),var(--color-liquid-light)_55%,var(--color-liquid-mid))]">
-                  <span class="eyebrow text-on-liquid">{item.note}</span>
-                </div>
-              )}
-            </div>
-
-            <div class="flex flex-col gap-5 p-6 md:p-8">
-              <p class="flex items-center gap-3 text-14 text-text-muted">
-                {item.logo && (
-                  <Image src={item.logo} alt="" widths={[48, 96]} sizes="24px" class="size-6! rounded-pill bg-text object-cover" />
-                )}
-                <span class="font-display font-heading text-text">{item.client}</span>
-                {timeline && <span aria-hidden="true">·</span>}
-                {timeline && <span class="tabular-nums">{timeline}</span>}
-              </p>
-
-              <div>
-                <h3 class="text-32 leading-tight text-balance">
-                  {item.href ? (
-                    <a href={item.href} class="no-underline after:absolute after:inset-0 after:content-['']">
-                      {item.title ?? item.client}
-                    </a>
-                  ) : (
-                    (item.title ?? item.client)
-                  )}
-                </h3>
-                {purpose && <p class="mt-3 font-headline text-18 leading-snug font-medium text-text-muted text-balance">{purpose}</p>}
-              </div>
-
-              {parts.length > 0 && (
-                <dl class="grid gap-4 border-t border-border pt-5">
-                  {parts.map((part) => (
-                    <div class="grid gap-1 sm:grid-cols-[8rem_1fr] sm:gap-4">
-                      <dt class="eyebrow text-14">{part.label}</dt>
-                      <dd class="text-16 leading-snug">{part.text}</dd>
-                    </div>
-                  ))}
-                </dl>
-              )}
-
-              <div class="mt-auto flex flex-wrap items-center justify-between gap-4 pt-2">
-                <RoleBadges roles={item.roles} />
-                {item.href && (
-                  <span class="inline-flex items-center gap-2 text-14 font-medium text-case-accent-strong" aria-hidden="true">
-                    Read the case
-                    <span class="transition-transform duration-160 ease-out group-hover:translate-x-1">→</span>
-                  </span>
-                )}
-              </div>
-            </div>
-          </article>
-        </li>
-      );
-    })
+    items.map((item, i) => (
+      <li>
+        <CaseCard item={item} eager={i === 0} />
+      </li>
+    ))
   }
 </ol>

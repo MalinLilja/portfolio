@@ -1,5 +1,15 @@
 ---
-positioning: Helping teams discover the whole picture, and design a product that fits it.
+positioning: Design for what matters.
+# Clicking "what matters" in the line above shows these, one at a time.
+# Drafts by Claude from your own texts, rewrite freely.
+positioningCycle:
+  phrase: what matters
+  options:
+    - the experts who use it
+    - the work behind the screen
+    - fewer, clearer choices
+    - users, developers and business
+    - what we can validate in users' hands
 description: Malin Lilja is a senior UX & product designer in Göteborg with 7 years of designing complex tools for expert users, from VFX production planning and freight optimization to insurance and SaaS platforms.
 # work: case study folders to link from that row (only published cases link)
 experience:

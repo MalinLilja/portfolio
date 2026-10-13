@@ -165,12 +165,12 @@
     vec2 p = (src - 0.5) * vec2(aspect, 1.) * scale;
     float stir = useField > 0.5 ? length(texture(vel, uv).xy) : 0.;
 
-    float e = 0.012;
-    float v  = shape(p, time);
-    float vx = shape(p + vec2(e,0.), time);
-    float vy = shape(p + vec2(0.,e), time);
+    // The surface is worked out once per pixel; its slope for the sheen comes from the
+    // neighbouring pixels (screen-space derivatives) instead of two extra evaluations
+    float v = shape(p, time);
+    vec2 slope = vec2(dFdx(v), dFdy(v)) / max(abs(vec2(dFdx(p.x), dFdy(p.y))), vec2(1e-5));
     float depth = mix(0.09, 0.035, soft);
-    vec3 nrm = normalize(vec3((v-vx)/e*depth, (v-vy)/e*depth, 1.));
+    vec3 nrm = normalize(vec3(-slope * depth, 1.));
     vec3 col = ramp(v);
 
     // glossy light from the upper left, plus a soft glow where the pointer is
@@ -308,7 +308,8 @@
       const r = section.getBoundingClientRect();
       boxW = Math.max(1, r.width);
       boxH = Math.max(1, r.height);
-      const dpr = Math.min(devicePixelRatio || 1, 2);
+      // The liquid is soft, so sharp screens don't need their full pixel density here
+      const dpr = Math.min(devicePixelRatio || 1, 1.25);
       const w = Math.round(boxW * dpr * QUALITY);
       const h = Math.round(boxH * dpr * QUALITY);
       if (canvas.width !== w || canvas.height !== h) {

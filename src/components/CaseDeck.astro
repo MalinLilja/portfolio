@@ -1,0 +1,218 @@
+---
+// Selected work as a card deck on the dark hero (wide screens with motion only; otherwise
+// CaseCards shows the plain list). Going to the next case rolls the front card up and away
+// and brings the next one forward: with the arrows, the dots, or the mouse wheel over the
+// cards (one case per scroll; at the first or last case the wheel scrolls the page). Over
+// the text, the wheel always scrolls the page. Cards further back sit lower and to the
+// right, and are distorted: a wavy displacement and a halftone screen, like the print look
+// of the hero photo, stronger the further back.
+// Must sit inside the hero stage's sticky container (index.astro, [data-hero-stage]).
+import CaseCard, { type CaseItem } from './CaseCard.astro';
+
+interface Props {
+  items: CaseItem[];
+}
+
+const { items } = Astro.props;
+// Distortion strength for cards 1, 2 and 3+ steps back
+const levels = [6, 14, 22];
+const control =
+  'cursor-pointer rounded-pill border border-border bg-surface text-text transition-[border-color,opacity] duration-160 ease-out enabled:hover:border-text disabled:cursor-default disabled:opacity-35';
+---
+
+<div
+  class="case-deck pointer-events-none absolute inset-0 z-30 hidden overflow-hidden opacity-(--wipe-intro,0) lg:js:motion-safe:block"
+  role="region"
+  aria-label="Selected work"
+>
+  <svg class="absolute size-0" aria-hidden="true">
+    {
+      levels.map((scale, i) => (
+        <filter id={`deck-distort-${i + 1}`} x="-5%" y="-5%" width="110%" height="110%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.012 0.06" numOctaves="2" seed={i + 3} />
+          <feDisplacementMap in="SourceGraphic" scale={scale} xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      ))
+    }
+  </svg>
+
+  {/* The front card, centred vertically with room for the controls below it */}
+  <ol class="deck-frame absolute top-[calc((100%-64svh-4.5rem)/2)] right-[calc(var(--gutter)+2.5rem)] h-[64svh] w-[min(1100px,56vw)] [perspective:1600px]">
+    {
+      items.map((item, i) => (
+        <li class="deck-card absolute inset-0 origin-top-left will-change-transform" data-deck-card data-client={item.client} inert>
+          <CaseCard item={item} compact eager={i < 2} />
+          {/* Halftone screen and shade for cards further back */}
+          <span
+            class="deck-halftone pointer-events-none absolute inset-0 rounded-media bg-[radial-gradient(circle,var(--color-bg)_1.1px,transparent_1.7px)] bg-size-[5px_5px] opacity-0"
+            aria-hidden="true"
+          />
+          <span class="deck-shade pointer-events-none absolute inset-0 rounded-media bg-bg opacity-0" aria-hidden="true" />
+        </li>
+      ))
+    }
+  </ol>
+
+  <div
+    class="pointer-events-auto absolute top-[calc((100%-64svh-4.5rem)/2+64svh+1.5rem)] right-[calc(var(--gutter)+2.5rem)] z-[200] flex w-[min(1100px,56vw)] items-center justify-between gap-4"
+  >
+    <button type="button" class:list={['deck-prev grid size-11 place-items-center text-18', control]} aria-label="Previous case">
+      <span aria-hidden="true">←</span>
+    </button>
+    <button type="button" class:list={['deck-next flex h-11 items-center gap-3 px-4', control]} aria-label="Next case">
+      <span class="deck-next-label text-14 text-text-muted" aria-hidden="true"></span>
+      <span class="text-18" aria-hidden="true">→</span>
+    </button>
+  </div>
+
+  <div class="absolute top-1/2 right-[calc(var(--gutter)/2)] flex -translate-y-1/2 flex-col items-center gap-2">
+    {
+      items.map((item, i) => (
+        <button
+          type="button"
+          class="deck-dot group/dot pointer-events-auto grid size-6 cursor-pointer place-items-center"
+          aria-label={`Show case ${i + 1}: ${item.client}`}
+        >
+          <span class="block size-2 rounded-pill bg-border transition-[background-color,height] duration-160 ease-out group-hover/dot:bg-text-muted group-aria-[current=true]/dot:h-6 group-aria-[current=true]/dot:bg-accent" />
+        </button>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  const deck = document.querySelector<HTMLElement>('.case-deck');
+  const stage = deck?.closest<HTMLElement>('[data-hero-stage]');
+  if (deck && stage) {
+    const frame = deck.querySelector<HTMLElement>('.deck-frame')!;
+    const cards = [...deck.querySelectorAll<HTMLElement>('[data-deck-card]')];
+    const dots = [...deck.querySelectorAll<HTMLButtonElement>('.deck-dot')];
+    const prev = deck.querySelector<HTMLButtonElement>('.deck-prev')!;
+    const next = deck.querySelector<HTMLButtonElement>('.deck-next')!;
+    const nextLabel = deck.querySelector<HTMLElement>('.deck-next-label')!;
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    const n = cards.length;
+    const DURATION_MS = 650;
+    const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
+    const active = () => getComputedStyle(deck).display !== 'none';
+
+    let current = 0; // the case in front
+    let p = 0; // shown position, animates towards current
+    let from = 0;
+    let startTime = 0;
+    let frameReq = 0;
+
+    // The wavy distortion is an SVG filter, which Chrome draws on the processor: it's left
+    // off while cards move and comes back once they've settled.
+    const render = (moving: boolean) => {
+      const w = frame.offsetWidth;
+      const h = frame.offsetHeight;
+      cards.forEach((card, i) => {
+        const d = i - p;
+        const halftone = card.querySelector<HTMLElement>('.deck-halftone')!;
+        const shade = card.querySelector<HTMLElement>('.deck-shade')!;
+        if (d < 0) {
+          // Rolling up and away
+          const u = Math.max(-1.2, d);
+          card.style.transform = `translate3d(0, ${(u * h * 1.15).toFixed(1)}px, 0) rotateX(${(-u * 14).toFixed(2)}deg)`;
+          card.style.opacity = String(clamp(1 + u * 1.1, 0, 1));
+        } else {
+          // Waiting behind: lower, to the right, a little smaller
+          card.style.transform = `translate3d(${(d * w * 0.11).toFixed(1)}px, ${(d * h * 0.43).toFixed(1)}px, 0) scale(${(1 - 0.05 * d).toFixed(3)})`;
+          card.style.opacity = d > 3.5 ? '0' : '1';
+        }
+        card.style.zIndex = String(Math.round(100 - d * 10));
+        const level = d < 0.4 ? 0 : d < 1.4 ? 1 : d < 2.4 ? 2 : 3;
+        card.style.filter = level && !moving ? `url(#deck-distort-${level})` : '';
+        halftone.style.opacity = String(clamp(d * 0.55, 0, 0.85));
+        shade.style.opacity = String(clamp(d * 0.3, 0, 0.6));
+        card.toggleAttribute('inert', i !== current);
+        card.style.pointerEvents = i === current ? 'auto' : 'none';
+      });
+    };
+
+    const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - startTime) / DURATION_MS);
+      p = from + (current - from) * ease(t);
+      render(t < 1);
+      frameReq = t < 1 ? requestAnimationFrame(tick) : 0;
+    };
+
+    const go = (i: number) => {
+      current = clamp(i, 0, n - 1);
+      from = p;
+      startTime = performance.now();
+      if (reduceMotion.matches) {
+        p = current;
+        render(false);
+      } else if (!frameReq) {
+        frameReq = requestAnimationFrame(tick);
+      }
+      prev.disabled = current === 0;
+      next.disabled = current === n - 1;
+      nextLabel.textContent = cards[current + 1] ? `Next: ${cards[current + 1].dataset.client}` : '';
+      dots.forEach((dot, k) => (k === current ? dot.setAttribute('aria-current', 'true') : dot.removeAttribute('aria-current')));
+    };
+
+    prev.addEventListener('click', () => go(current - 1));
+    next.addEventListener('click', () => go(current + 1));
+    dots.forEach((dot, i) => dot.addEventListener('click', () => go(i)));
+
+    // Mouse wheel over the cards (not the text): one case per gesture. At the first or last
+    // case it lets the page scroll. A short lock swallows trackpad momentum.
+    let lockedUntil = 0;
+    let wheelSum = 0;
+    const overCards = (x: number, y: number) => {
+      const r = frame.getBoundingClientRect();
+      return x >= r.left && y >= r.top && y <= innerHeight;
+    };
+    window.addEventListener(
+      'wheel',
+      (e) => {
+        if (e.ctrlKey || !active() || parseFloat(getComputedStyle(deck).opacity) < 0.5) return;
+        if (!overCards(e.clientX, e.clientY)) return;
+        const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+        const now = performance.now();
+        if (now < lockedUntil) {
+          e.preventDefault();
+          lockedUntil = Math.max(lockedUntil, now + 120);
+          return;
+        }
+        const step = Math.sign(delta);
+        if ((step < 0 && current === 0) || (step > 0 && current === n - 1)) {
+          wheelSum = 0;
+          return;
+        }
+        e.preventDefault();
+        wheelSum += delta;
+        if (Math.abs(wheelSum) >= 30) {
+          go(current + step);
+          wheelSum = 0;
+          lockedUntil = now + 700;
+        }
+      },
+      { passive: false },
+    );
+
+    // The header's Work link goes to the dark screen with the cards
+    document.querySelectorAll<HTMLAnchorElement>('a[href$="#work"]').forEach((a) =>
+      a.addEventListener('click', (e) => {
+        if (!active() || location.pathname !== '/') return;
+        e.preventDefault();
+        window.scrollTo({ top: window.scrollY + stage.getBoundingClientRect().top + innerHeight * 0.3, behavior: 'smooth' });
+      }),
+    );
+    addEventListener('resize', () => render(false));
+
+    // Until the hero has turned dark the deck is invisible, and it must not catch clicks or
+    // keyboard focus either (the front card would otherwise sit over the hero photo)
+    const setVisible = (wipe: number) => {
+      deck.style.visibility = wipe >= 0.5 ? 'visible' : 'hidden';
+    };
+    setVisible((window as unknown as { heroWipe?: number }).heroWipe ?? 0);
+    window.addEventListener('hero-wipe', (e) => setVisible((e as CustomEvent<number>).detail));
+    go(0);
+    render(false);
+  }
+</script>

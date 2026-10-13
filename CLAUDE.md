@@ -2,7 +2,7 @@
 
 ## What this is
 Static portfolio for a senior UX & product designer, aimed at recruiters and hiring managers.
-Positioning: "Helping teams discover the whole picture, and design a product that fits it."
+Positioning: "Design for what matters."
 Spec: docs/portfolio-spec.md (read before larger changes).
 
 ## Stack
@@ -12,7 +12,7 @@ Commands: npm run dev | npm run build | npm run preview | npm run check:copy
 ## Where things live
 - src/content/work/<slug>/index.md – one case study per folder, images next to it. Front matter holds the card, TL;DR, accent colour and process steps.
 - src/content/site/home.md, src/content/site/cv.md – home page and CV copy.
-- src/components/ – Header, Footer, LiquidHero (WebGL hero, from explorations/liquid-landing.html), HeroPhoto, HeroStarWipe, ConnectTheDots, CaseCards, WorkBento (unused), Practice, CaseBento, BentoTile, RoleBadges, ExperienceStrip, Quote, ProcessStepper, LinkButton, StarDivider, ImageZoom.
+- src/components/ – Header, Footer, LiquidHero (WebGL hero, from explorations/liquid-landing.html), HeroPhoto, HeroStarWipe, ConnectTheDots, CaseCard, CaseCards, CaseDeck, WorkBento (unused), Practice, CaseBento, BentoTile, RoleBadges, ExperienceStrip, Quote, ProcessStepper, LinkButton, StarDivider, ImageZoom.
 - src/lib/brackets.ts and src/lib/markdown-plugins.mjs – hide [bracketed] gaps; turn image-only paragraphs into figures (title → caption, two images → side-by-side pair).
 - scripts/check-copy.mjs – forbidden-terms check. Runs after every build and on demand.
 

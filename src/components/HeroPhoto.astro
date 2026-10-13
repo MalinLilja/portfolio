@@ -17,7 +17,7 @@ const { src, alt } = Astro.props;
 ---
 
 <div
-  class="hero-photo pointer-events-none absolute [mask-image:linear-gradient(to_bottom,black_62%,transparent)] right-0 -bottom-16 z-10 w-[84vw] max-w-[820px] md:right-[calc(var(--gutter)+1%)] md:-bottom-24 md:w-[50vw] lg:right-[max(0px,calc((100vw-var(--container-content))/2-240px))] lg:w-[58vw] lg:max-w-[976px]"
+  class="hero-photo pointer-events-none absolute [mask-image:linear-gradient(to_bottom,black_62%,transparent)] right-0 -bottom-16 z-10 w-[84vw] max-w-[820px] md:right-[calc(var(--gutter)+1%)] md:-bottom-24 md:w-[50vw] lg:right-[calc(max(0px,(100vw-var(--container-content))/2-360px)-4vw)] lg:w-[58vw] lg:max-w-[976px]"
 >
   <Image
     src={src}
@@ -25,7 +25,7 @@ const { src, alt } = Astro.props;
     widths={[320, 480, 720, 976]}
     sizes="(min-width: 1683px) 976px, (min-width: 1080px) 58vw, (min-width: 720px) 50vw, 84vw"
     loading="eager"
-    class="hero-photo-img h-auto! w-full! will-change-transform"
+    class="hero-photo-img h-auto! w-full!"
   />
 </div>
 
@@ -35,8 +35,10 @@ const { src, alt } = Astro.props;
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
   if (photo && img) {
     // A spring: mouse movement pushes the photo, and it eases back to where it was
-    const PUSH = 0.18; // share of the mouse movement passed on to the photo
-    const MAX_PX = 8;
+    // The whole frame moves (not the picture inside it): the frame's fade mask also clips to
+    // its edges, so moving the picture inside it would cut off its sides
+    const PUSH = 0.1; // share of the mouse movement passed on to the photo
+    const MAX_PX = 4;
     const STIFFNESS = 0.08;
     const DAMPING = 0.82;
     let x = 0;
@@ -50,10 +52,10 @@ const { src, alt } = Astro.props;
       vy = (vy - y * STIFFNESS) * DAMPING;
       x = Math.max(-MAX_PX, Math.min(MAX_PX, x + vx));
       y = Math.max(-MAX_PX, Math.min(MAX_PX, y + vy));
-      img.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) rotate(${(x * 0.04).toFixed(3)}deg)`;
+      photo.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) rotate(${(x * 0.03).toFixed(3)}deg)`;
       const resting = Math.abs(x) < 0.05 && Math.abs(y) < 0.05 && Math.abs(vx) < 0.05 && Math.abs(vy) < 0.05;
       if (resting) {
-        img.style.transform = '';
+        photo.style.transform = '';
         frame = 0;
       } else {
         frame = requestAnimationFrame(tick);
@@ -75,8 +77,8 @@ const { src, alt } = Astro.props;
         if (!inside) return;
         // Fast flicks count no more than a medium movement, so the nudge stays small
         const cap = (n: number) => Math.max(-24, Math.min(24, n));
-        vx = Math.max(-3, Math.min(3, vx + cap(event.movementX) * PUSH * STIFFNESS * 4));
-        vy = Math.max(-3, Math.min(3, vy + cap(event.movementY) * PUSH * STIFFNESS * 4));
+        vx = Math.max(-2, Math.min(2, vx + cap(event.movementX) * PUSH * STIFFNESS * 4));
+        vy = Math.max(-2, Math.min(2, vy + cap(event.movementY) * PUSH * STIFFNESS * 4));
         if (!frame) frame = requestAnimationFrame(tick);
       },
       { passive: true },
