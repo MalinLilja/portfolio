@@ -1,9 +1,10 @@
 ---
 // Malin's cut-out photo, placed over the lower right of the hero and overlapping its
-// bottom edge. A light parallax makes it drift slower than the page while scrolling
-// (switched off for reduced motion). The bottom third fades out so the cut-out has no hard
-// edge. Waving the mouse over the photo leaves a trail of sparkles (mouse only, and not
-// with reduced motion). Must sit inside a `relative` wrapper around the hero.
+// bottom edge. It stays put while the hero is pinned, and the growing star covers it as the
+// hero turns dark (see HeroStarWipe). The bottom third fades out so the cut-out
+// has no hard edge. Moving the mouse over the photo gives it a small nudge in the direction
+// of the movement, and it springs back (mouse only, and not with reduced motion). Must sit
+// inside a `relative` wrapper around the hero.
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 
@@ -16,98 +17,67 @@ const { src, alt } = Astro.props;
 ---
 
 <div
-  class="hero-photo pointer-events-none absolute [mask-image:linear-gradient(to_bottom,black_62%,transparent)] right-2 -bottom-16 z-10 w-[70vw] max-w-[680px] will-change-transform md:right-[calc(var(--gutter)+2%)] md:-bottom-24 md:w-[42vw]"
+  class="hero-photo pointer-events-none absolute [mask-image:linear-gradient(to_bottom,black_62%,transparent)] right-0 -bottom-16 z-10 w-[84vw] max-w-[820px] md:right-[calc(var(--gutter)+1%)] md:-bottom-24 md:w-[50vw] lg:right-[max(0px,calc((100vw-var(--container-content))/2-240px))] lg:w-[58vw] lg:max-w-[976px]"
 >
   <Image
     src={src}
     alt={alt}
     widths={[320, 480, 720, 976]}
-    sizes="(min-width: 1620px) 680px, (min-width: 720px) 42vw, 70vw"
+    sizes="(min-width: 1683px) 976px, (min-width: 1080px) 58vw, (min-width: 720px) 50vw, 84vw"
     loading="eager"
-    class="h-auto! w-full!"
+    class="hero-photo-img h-auto! w-full! will-change-transform"
   />
 </div>
-<!-- Sparkles live outside the photo, so the fade and the parallax don't touch them -->
-<div class="hero-sparkles pointer-events-none fixed inset-0 z-20 overflow-hidden" aria-hidden="true"></div>
 
 <script>
   const photo = document.querySelector<HTMLElement>('.hero-photo');
+  const img = photo?.querySelector<HTMLElement>('.hero-photo-img');
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
-  if (photo) {
-    // Drifts down at 18% of the scroll speed, so it lags behind the page
-    const SPEED = 0.18;
-    let ticking = false;
-    const update = () => {
-      ticking = false;
-      // On phones the intro text below runs full width, so keep the drift short there
-      const max = window.innerWidth < 720 ? 24 : 320;
-      const y = reduceMotion.matches ? 0 : Math.min(window.scrollY * SPEED, max);
-      photo.style.transform = `translate3d(0, ${y.toFixed(1)}px, 0)`;
-    };
-    window.addEventListener(
-      'scroll',
-      () => {
-        if (!ticking) {
-          ticking = true;
-          requestAnimationFrame(update);
-        }
-      },
-      { passive: true },
-    );
-    reduceMotion.addEventListener('change', update);
-    update();
+  if (photo && img) {
+    // A spring: mouse movement pushes the photo, and it eases back to where it was
+    const PUSH = 0.18; // share of the mouse movement passed on to the photo
+    const MAX_PX = 8;
+    const STIFFNESS = 0.08;
+    const DAMPING = 0.82;
+    let x = 0;
+    let y = 0;
+    let vx = 0;
+    let vy = 0;
+    let frame = 0;
 
-    // Sparkles: one for every few pixels the mouse travels over the photo
-    const layer = document.querySelector<HTMLElement>('.hero-sparkles')!;
-    // Colours that show on both the light liquid and the dark jacket
-    const colors = ['var(--color-text)', 'var(--color-liquid-shine)', 'var(--color-violet)', 'var(--color-liquid-deep)'];
-    const STEP_PX = 32;
-    const MAX_SPARKLES = 16;
-    let last: { x: number; y: number } | null = null;
-
-    const sparkle = (x: number, y: number) => {
-      if (layer.childElementCount >= MAX_SPARKLES) return;
-      const size = 7 + Math.random() * 9;
-      const el = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      el.setAttribute('viewBox', '0 0 24 24');
-      el.style.cssText = `position:absolute;left:${x - size / 2}px;top:${y - size / 2}px;width:${size}px;height:${size}px;fill:${colors[Math.floor(Math.random() * colors.length)]};filter:drop-shadow(0 0 4px var(--color-liquid-light))`;
-      el.innerHTML = '<path d="M12 0C13 8 16 11 24 12C16 13 13 16 12 24C11 16 8 13 0 12C8 11 11 8 12 0Z"/>';
-      layer.append(el);
-      const dx = (Math.random() - 0.5) * 40;
-      const dy = 10 + Math.random() * 30;
-      const turn = (Math.random() - 0.5) * 180;
-      el.animate(
-        [
-          { transform: 'scale(0) rotate(0deg)', opacity: 1, easing: 'ease-out' },
-          { transform: `translate(${dx * 0.25}px, ${dy * 0.2}px) scale(1) rotate(${turn / 3}deg)`, opacity: 1, offset: 0.25 },
-          { opacity: 1, offset: 0.6 },
-          { transform: `translate(${dx}px, ${dy}px) scale(0.2) rotate(${turn}deg)`, opacity: 0 },
-        ],
-        { duration: 900 + Math.random() * 600 },
-      ).onfinish = () => el.remove();
+    const tick = () => {
+      vx = (vx - x * STIFFNESS) * DAMPING;
+      vy = (vy - y * STIFFNESS) * DAMPING;
+      x = Math.max(-MAX_PX, Math.min(MAX_PX, x + vx));
+      y = Math.max(-MAX_PX, Math.min(MAX_PX, y + vy));
+      img.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) rotate(${(x * 0.04).toFixed(3)}deg)`;
+      const resting = Math.abs(x) < 0.05 && Math.abs(y) < 0.05 && Math.abs(vx) < 0.05 && Math.abs(vy) < 0.05;
+      if (resting) {
+        img.style.transform = '';
+        frame = 0;
+      } else {
+        frame = requestAnimationFrame(tick);
+      }
     };
 
     document.addEventListener(
       'pointermove',
       (event) => {
-        if (event.pointerType !== 'mouse' || reduceMotion.matches) return;
-        // The cut-out doesn't fill its box at the sides, so the hot area is a bit narrower
+        // Not once the star has covered the photo
+        if (event.pointerType !== 'mouse' || reduceMotion.matches || photo.style.opacity === '0') return;
+        // The cut-out doesn't fill its box at the sides, so the area that reacts is a bit narrower
         const r = photo.getBoundingClientRect();
         const inside =
-          event.clientX > r.left + r.width * 0.12 &&
-          event.clientX < r.right - r.width * 0.12 &&
+          event.clientX > r.left + r.width * 0.15 &&
+          event.clientX < r.right - r.width * 0.15 &&
           event.clientY > r.top &&
           event.clientY < r.bottom - r.height * 0.15;
-        if (!inside) {
-          last = null;
-          return;
-        }
-        const point = { x: event.clientX, y: event.clientY };
-        if (!last) last = point;
-        if (Math.hypot(point.x - last.x, point.y - last.y) >= STEP_PX) {
-          sparkle(point.x, point.y);
-          last = point;
-        }
+        if (!inside) return;
+        // Fast flicks count no more than a medium movement, so the nudge stays small
+        const cap = (n: number) => Math.max(-24, Math.min(24, n));
+        vx = Math.max(-3, Math.min(3, vx + cap(event.movementX) * PUSH * STIFFNESS * 4));
+        vy = Math.max(-3, Math.min(3, vy + cap(event.movementY) * PUSH * STIFFNESS * 4));
+        if (!frame) frame = requestAnimationFrame(tick);
       },
       { passive: true },
     );

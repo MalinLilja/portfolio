@@ -3,12 +3,14 @@ import { getCollection, getEntry, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import LiquidHero from '../components/LiquidHero.astro';
 import HeroPhoto from '../components/HeroPhoto.astro';
-import WorkBento from '../components/WorkBento.astro';
+import HeroStarWipe from '../components/HeroStarWipe.astro';
+import Sketchbook from '../components/Sketchbook.astro';
 import Practice from '../components/Practice.astro';
 import ConnectTheDots from '../components/ConnectTheDots.astro';
 import ExperienceStrip from '../components/ExperienceStrip.astro';
 import Quote from '../components/Quote.astro';
 import StarDivider from '../components/StarDivider.astro';
+import { hideGaps } from '../lib/brackets';
 
 const profile = (await getEntry('site', 'profile'))!.data;
 const home = (await getEntry('site', 'home'))!;
@@ -23,6 +25,10 @@ const experience = (home.data.experience ?? []).map((item) => ({
   }),
 }));
 const testimonials = home.data.testimonials ?? [];
+// The intro's first paragraph, one sentence per line, for the dark hero
+const leadSentences = hideGaps((home.body ?? '').trim().split(/\r?\n\s*\r?\n/)[0])
+  .split(/(?<=[.!?])\s+/)
+  .filter(Boolean);
 const work = [
   ...(home.data.comingSoon ?? []).map((c) => ({ client: c.client, company: c.company, purpose: c.purpose, note: c.note, roles: c.roles ?? [] })),
   ...cases.map((c) => ({
@@ -43,37 +49,54 @@ const work = [
   description={home.data.description!}
   ogType="profile"
 >
-  <!-- The photo overlaps the hero's bottom edge, so it sits in a wrapper outside the hero's clipping -->
-  <div class="relative">
+  <!-- Hero stage: with JavaScript and motion allowed, a little scroll makes a star from the
+       corner grow until the hero is dark, while the hero stays pinned briefly (see HeroStarWipe).
+       The hero text fades out and the intro's first paragraph fades in on the dark screen.
+       The photo overlaps the hero's bottom edge, so it sits outside the hero's clipping. -->
+  <div class="relative js:motion-safe:h-[calc(100svh-var(--header-height)+var(--wipe-travel))] [--wipe-travel:30svh]" data-hero-stage>
+    <div class="relative js:motion-safe:sticky js:motion-safe:top-(--header-height)">
     <LiquidHero>
-      <p class="eyebrow text-on-liquid-muted">{profile.title} · {profile.city}</p>
-      <p class="mt-5 font-display text-hero leading-[0.92] font-name uppercase">
+      {/* Fades out as the star covers the hero (--wipe-text, 0 → 1) */}
+      <p class="eyebrow text-on-liquid-muted opacity-[calc(1-var(--wipe-text,0))]">{profile.title} · {profile.city}</p>
+      <p class="mt-5 font-display text-hero leading-[0.92] font-name uppercase opacity-[calc(1-var(--wipe-text,0))]">
         {profile.name.split(' ').map((part) => <span class="block">{part}</span>)}
       </p>
-      <h1 id="positioning" class="mt-[clamp(28px,5vh,56px)] max-w-[18ch] text-32 leading-[1.15]">{home.data.positioning}</h1>
+      <h1 id="positioning" class="mt-[clamp(28px,5vh,56px)] max-w-[18ch] font-headline text-32 leading-[1.15] font-medium tracking-normal opacity-[calc(1-var(--wipe-text,0))]">{home.data.positioning}</h1>
       {/* Room for the photo on phones, where it sits under the text */}
       {home.data.photo && <div class="h-44 md:hidden" aria-hidden="true" />}
     </LiquidHero>
     {home.data.photo && <HeroPhoto src={home.data.photo} alt={home.data.photoAlt ?? ''} />}
-  </div>
-
-  <!-- Intro, under the hero. Kept to the left: the photo hangs into this section on the right. -->
-  <section class="container-page pt-[clamp(96px,14vh,160px)]" aria-labelledby="about-heading">
-    <h2 id="about-heading" class="sr-only">About me</h2>
-    <div class="max-w-[60ch] text-text-muted md:max-w-[48%] [&_p:first-child]:font-headline [&_p:first-child]:text-22 [&_p:first-child]:leading-snug [&_p:first-child]:font-medium [&_p:first-child]:text-text [&_p+p]:mt-6">
-      <Intro />
+    <HeroStarWipe />
+    {/* The intro's first paragraph, shown on the dark hero once the star has covered it
+        (--wipe-intro, 0 → 1). Only in the animated version; otherwise it stays in the intro below. */}
+    <div class="pointer-events-none absolute inset-0 z-30 hidden items-center opacity-(--wipe-intro,0) lg:items-start lg:pt-[14svh] js:motion-safe:flex [&.is-shown]:pointer-events-auto" data-hero-lead>
+      <div class="container-page">
+        <div class="mx-auto grid max-w-[60ch] gap-4 text-center font-headline text-18 leading-snug font-medium text-balance text-text md:max-w-[44%]">
+          {leadSentences.map((sentence) => <p>{sentence}</p>)}
+        </div>
+      </div>
     </div>
-  </section>
+    </div>
+  </div>
 
   <div class="container-page">
     {home.data.journey && !home.data.journey.hidden && <ConnectTheDots {...home.data.journey} />}
 
-    <section id="work" class="pt-[clamp(48px,10vh,120px)]" aria-labelledby="work-heading">
-      <div class="mb-8 flex items-baseline justify-between gap-4">
-        <h2 id="work-heading" class="text-48 leading-none">Selected work</h2>
-        <p class="text-14 whitespace-nowrap text-text-muted">2019 – present</p>
+    {/* With the animated hero on wide screens, the sketchbook is pulled up so it lies over the
+         bottom of the dark hero, beside the "I care…" text */}
+    <section id="work" class="relative z-40 pt-[clamp(48px,10vh,120px)] lg:js:motion-safe:-mt-[34svh] lg:js:motion-safe:pt-0" aria-labelledby="work-heading">
+      {/* Not shown, but names the sketchbook for screen readers */}
+      <h2 id="work-heading" class="sr-only">Selected work</h2>
+      <Sketchbook items={work} labelledby="work-heading" />
+    </section>
+
+    <!-- Intro, under Selected work. Kept to the left. -->
+    <section class="pt-24" aria-labelledby="about-heading">
+      <h2 id="about-heading" class="sr-only">About me</h2>
+      {/* In the animated version the first paragraph is shown on the dark hero instead (above) */}
+      <div class="max-w-[60ch] text-text-muted md:max-w-[48%] [&_p:first-child]:font-headline [&_p:first-child]:text-22 [&_p:first-child]:leading-snug [&_p:first-child]:font-medium [&_p:first-child]:text-text js:motion-safe:[&_p:first-child]:hidden [&_p+p]:mt-6">
+        <Intro />
       </div>
-      <WorkBento items={work} labelledby="work-heading" />
     </section>
 
     {home.data.practice && !home.data.practice.hidden && <Practice {...home.data.practice} />}

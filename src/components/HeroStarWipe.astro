@@ -1,0 +1,101 @@
+---
+// A four-point star in the hero's top right corner. A little scroll starts the transition:
+// the star grows on its own until the whole hero is the page's dark background, while the
+// hero stays pinned for a short stretch (index.astro, [data-hero-stage]). It covers the photo,
+// the hero text fades out (--wipe-text) and the intro's first paragraph fades in on the dark
+// screen (--wipe-intro, [data-hero-lead]). Scrolling back to the top plays it in reverse.
+// It never scrolls the page itself.
+// Off without JavaScript and with reduced motion: then it's just a small star.
+---
+
+<div class="hero-wipe pointer-events-none absolute inset-0 z-20 overflow-hidden" aria-hidden="true">
+  <svg
+    class="hero-wipe-star absolute top-[14%] right-[calc(var(--gutter)+4%)] size-12 origin-center translate-x-1/2 -translate-y-1/2 fill-bg md:size-16"
+    viewBox="0 0 100 100"
+  >
+    <path d="M50 0C54 36 64 46 100 50C64 54 54 64 50 100C46 64 36 54 0 50C36 46 46 36 50 0Z" />
+  </svg>
+  <!-- Closes the last gaps between the star's points at the end of the transition -->
+  <div class="hero-wipe-fill absolute inset-0 bg-bg opacity-0"></div>
+</div>
+
+<script>
+  const stage = document.querySelector<HTMLElement>('[data-hero-stage]');
+  const wipe = document.querySelector<HTMLElement>('.hero-wipe');
+  const star = wipe?.querySelector<SVGElement>('.hero-wipe-star');
+  const fill = wipe?.querySelector<HTMLElement>('.hero-wipe-fill');
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (stage && wipe && star && fill) {
+    const photo = stage.querySelector<HTMLElement>('.hero-photo');
+    const lead = stage.querySelector<HTMLElement>('[data-hero-lead]');
+    // A little scroll starts the transition; scrolling back to the top plays it in reverse
+    const TRIGGER_PX = 16;
+    const DURATION_MS = 650;
+    let p = 0; // 0 = liquid hero, 1 = dark
+    let target = 0;
+    let frame = 0;
+    let last = 0;
+
+    const render = () => {
+      if (reduceMotion.matches) {
+        star.style.transform = '';
+        fill.style.opacity = '0';
+        stage.style.removeProperty('--wipe-text');
+        stage.style.removeProperty('--wipe-intro');
+        if (photo) photo.style.opacity = '';
+        return;
+      }
+      // Big enough that the star's narrow waist covers the far corner of the hero
+      const box = wipe.getBoundingClientRect();
+      const base = parseFloat(getComputedStyle(star).width) || 48;
+      // The waist between two points is about a fifth of the star's size
+      const maxScale = Math.max(1, (Math.hypot(box.width, box.height) * 2 * 5) / base);
+      // Grows slowly at first, then fast, like zooming in
+      const scale = Math.pow(maxScale, p * p);
+      star.style.transform = `scale(${scale}) rotate(${p * 45}deg)`;
+      const covered = Math.min(1, Math.max(0, (p - 0.85) / 0.12));
+      fill.style.opacity = String(covered);
+      // The hero text fades out as the dark comes in, then the intro's first paragraph fades in
+      stage.style.setProperty('--wipe-text', String(Math.min(1, Math.max(0, (p - 0.55) / 0.3))));
+      const intro = Math.min(1, Math.max(0, (p - 0.85) / 0.15));
+      stage.style.setProperty('--wipe-intro', String(intro));
+      lead?.classList.toggle('is-shown', intro > 0.5);
+      // The part of the photo that hangs below the hero isn't under the star, so fade it out
+      if (photo) photo.style.opacity = String(1 - covered);
+    };
+
+    const step = (now: number) => {
+      const dt = last ? now - last : 16;
+      last = now;
+      const dir = Math.sign(target - p);
+      p = Math.min(1, Math.max(0, p + (dir * dt) / DURATION_MS));
+      render();
+      frame = p === target ? 0 : requestAnimationFrame(step);
+    };
+
+    const animateTo = (t: number) => {
+      target = t;
+      if (target !== p && !frame) {
+        last = 0;
+        frame = requestAnimationFrame(step);
+      }
+    };
+
+    const onScroll = () => {
+      if (reduceMotion.matches) return;
+      animateTo(window.scrollY > TRIGGER_PX ? 1 : 0);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', render);
+    reduceMotion.addEventListener('change', () => {
+      p = reduceMotion.matches ? 0 : p;
+      render();
+      animateTo(window.scrollY > TRIGGER_PX && !reduceMotion.matches ? 1 : 0);
+    });
+    // Arriving mid-page (a reload or a link back) shows the dark state straight away
+    p = target = window.scrollY > TRIGGER_PX && !reduceMotion.matches ? 1 : 0;
+    render();
+  }
+</script>

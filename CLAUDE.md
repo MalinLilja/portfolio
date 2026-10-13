@@ -2,7 +2,7 @@
 
 ## What this is
 Static portfolio for a senior UX & product designer, aimed at recruiters and hiring managers.
-Positioning: "I design complex tools for the experts who use them."
+Positioning: "Helping teams discover the whole picture, and design a product that fits it."
 Spec: docs/portfolio-spec.md (read before larger changes).
 
 ## Stack
@@ -12,7 +12,7 @@ Commands: npm run dev | npm run build | npm run preview | npm run check:copy
 ## Where things live
 - src/content/work/<slug>/index.md – one case study per folder, images next to it. Front matter holds the card, TL;DR, accent colour and process steps.
 - src/content/site/home.md, src/content/site/cv.md – home page and CV copy.
-- src/components/ – Header, Footer, LiquidHero (WebGL hero, from explorations/liquid-landing.html), HeroPhoto, ConnectTheDots, WorkBento, Practice, CaseBento, BentoTile, RoleBadges, ExperienceStrip, Quote, ProcessStepper, LinkButton, StarDivider, ImageZoom.
+- src/components/ – Header, Footer, LiquidHero (WebGL hero, from explorations/liquid-landing.html), HeroPhoto, HeroStarWipe, ConnectTheDots, Sketchbook (+ sketchbook/PhotoPage, TextPage), WorkBento (unused), Practice, CaseBento, BentoTile, RoleBadges, ExperienceStrip, Quote, ProcessStepper, LinkButton, StarDivider, ImageZoom.
 - src/lib/brackets.ts and src/lib/markdown-plugins.mjs – hide [bracketed] gaps; turn image-only paragraphs into figures (title → caption, two images → side-by-side pair).
 - scripts/check-copy.mjs – forbidden-terms check. Runs after every build and on demand.
 
@@ -22,7 +22,7 @@ Commands: npm run dev | npm run build | npm run preview | npm run check:copy
 - Never use internal ILP system names, internal URLs or business plans.
 - Never add the reference letter file, personal identity numbers or the Amply email.
 - Email is liljacmalin@gmail.com. Ziklo copy says "residual value".
-- The ILP case must not exist in src/content/work/ until ILP has approved it in writing. It is a "Coming soon" card only.
+- The ILP case (src/content/work/ilp/) is built only from the slides ILP approved in writing ("ILP case.pptx", October 2026). Add nothing about ILP beyond what those slides show; new ILP content needs new approval. The approved screenshots show the system name, but never write it in text.
 - Style with Tailwind utility classes in the markup. Only token classes exist (the default palette and type scale are off): bg-surface, text-text-muted, text-22, rounded-card, font-display, max-w-reading.
 - Spacing uses Tailwind's 4 px grid: Figma space/16 → p-4, space/48 → mt-12. Breakpoints: md = 720px, lg = 1080px.
 - No hard-coded colours. A new colour is a new token in tokens.css (and a Figma variable).

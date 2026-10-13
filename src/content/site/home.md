@@ -1,11 +1,12 @@
 ---
-positioning: I design complex tools for the experts who use them.
+positioning: Helping teams discover the whole picture, and design a product that fits it.
 description: Malin Lilja is a senior UX & product designer in Göteborg with 7 years of designing complex tools for expert users, from VFX production planning and freight optimization to insurance and SaaS platforms.
 # work: case study folders to link from that row (only published cases link)
 experience:
   - role: Senior UX Designer
     org: ILP VFX
     years: 2025–present
+    work: [ilp]
   - role: Product Designer & Project Manager
     org: Amply
     years: 2023–2025
@@ -18,14 +19,12 @@ experience:
     org: InUse
     years: "2019"
 # Cases that can't be shown yet. Shown first, as a card that doesn't link anywhere.
-comingSoon:
-  - client: ILP VFX
-    summary: One planning platform for a 200-person VFX studio, from research to live product.
-    note: Coming soon
-    roles: [Senior UX designer, Design lead]
-    company: ILP VFX, one of Scandinavia's largest VFX and animation studios (200+ people)
-    # draft by Claude, rewrite freely
-    purpose: Bring crewing and bidding into one planning platform, replacing a legacy system and disconnected spreadsheets.
+# Example:
+#   - client: Company name
+#     summary: One line about the project.
+#     note: Coming soon
+#     roles: [Your role]
+comingSoon: []
 # Testimonials section on the home page. Add more with another "- text:" block.
 # Practice section on the home page: how you work, in three stages
 practice:
@@ -56,7 +55,8 @@ practice:
 # The line gets cleaner from left to right. Steps 2, 3, 5 and 6 reuse your Practice copy;
 # the title and steps 1 and 4 are drafts by Claude, rewrite freely.
 journey:
-  hidden: false
+  # true = not shown on the site for now; set to false to show it again
+  hidden: true
   title: From first idea to shipped product
   steps:
     - title: A first idea
@@ -80,6 +80,8 @@ testimonials:
     title: CTO, ILP VFX
 ---
 
-For 7 years I've designed for demanding users, from VFX production planning and freight optimization to insurance and SaaS platforms. I take the work from research to shipped product, close to both users and developers.
+I care about how the work takes shape, from the first sketch to shipped product. Sometimes that means taking on the broad strokes and owning what to solve, for whom, why, and how it all connects. Sometimes it means making an interaction feel just right. Often, that means distilling a lot of voices into something we can validate in users' hands.
 
-I like connecting user insights, technical feasibility and business impact. I enjoy shaping a project's direction, and I still love a deep dive in Figma to work out the flows and interaction details.
+My core is user experience and product design in complex expert domains. Around it, I bring design systems that keep products consistent as they grow, systems thinking that connects the experience, and a visual eye for the details that matter.
+
+For 7 years I've designed for opinionated and specialized users, from VFX production planning and freight optimization to residual values and GDPR compliance. Most recently, I led design across the internal product portfolio at one of Scandinavia's largest VFX studios. I set direction and quality for a team of three designers, and worked closely with the developers building the studio's new resource and financial planning platform.

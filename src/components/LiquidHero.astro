@@ -4,14 +4,21 @@
 // Colours come from the --color-liquid-* tokens. Without WebGL2 the section shows a
 // static gradient of the same colours. The bottom edge fades into the page background,
 // so the photo that overlaps it doesn't get cut by a hard line.
+// The liquid is its own layer and the text sits on z-30, so on the home page the photo
+// (z-10) and the star transition (z-20) can go between them (see index.astro).
 ---
 
 <section
-  class="liquid-hero relative isolate flex [--hero-fade:clamp(180px,30vh,320px)] [mask-image:linear-gradient(to_bottom,black_calc(100%-var(--hero-fade)),transparent)] min-h-[calc(100svh-var(--header-height))] flex-col justify-end overflow-hidden bg-liquid-mid bg-[linear-gradient(140deg,var(--color-liquid-deep),var(--color-liquid-light)_55%,var(--color-liquid-mid))] text-on-liquid"
+  class="liquid-hero relative flex [--hero-fade:clamp(180px,30vh,320px)] min-h-[calc(100svh-var(--header-height))] flex-col justify-end text-on-liquid"
   aria-labelledby="positioning"
 >
-  <canvas class="liquid-canvas absolute inset-0 -z-10 size-full" aria-hidden="true"></canvas>
-  <div class="container-page pt-16 pb-[calc(var(--hero-fade)*0.6)]">
+  <div
+    class="absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_bottom,black_calc(100%-var(--hero-fade)),transparent)] bg-liquid-mid bg-[linear-gradient(140deg,var(--color-liquid-deep),var(--color-liquid-light)_55%,var(--color-liquid-mid))]"
+    aria-hidden="true"
+  >
+    <canvas class="liquid-canvas absolute inset-0 size-full"></canvas>
+  </div>
+  <div class="relative z-30 container-page pt-16 pb-[calc(var(--hero-fade)*0.6)]">
     <slot />
   </div>
 </section>

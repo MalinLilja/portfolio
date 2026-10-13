@@ -17,6 +17,8 @@ tldr:
   role: Product designer and product owner
   timeline: 2024, about 600 hours for the full team
   problem: Ships are often ordered to sail at a speed and fuel use that is far from optimal, because no one can weigh all the factors that affect earnings.
+  # Stakeholders tile in the summary bento: one per line, e.g. - Residual value analysts
+  stakeholders: ["[stakeholders]"]
   whatIDid: Led a pre-study that turned an expert calculation method into an app concept, then owned the design and roadmap through to launch.
   result: SmartOpt launched to customers and is live at smartopt.se. [Add customers or usage if you can.]
 process: [Research, Mapping, Conceptualising, Roadmap, UI design, Delivery]

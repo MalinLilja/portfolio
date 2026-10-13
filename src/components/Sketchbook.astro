@@ -1,0 +1,210 @@
+---
+// Selected work as an open sketchbook: each case is a spread on dot-grid paper, with the
+// picture taped to the left page and purpose, company, role and a link on the right page.
+// From 1080px the pages turn in 3D (arrows or dots; the mouse wheel always scrolls the page), and the
+// book lies tilted on the right, sliding up into place from the bottom left as you scroll.
+// On smaller screens the cases are single pages you swipe through.
+//
+// How the turning works: every case's right page is the front of a "leaf" hinged at the
+// spine, and the back of that leaf is the next case's left page. Turning to case n flips
+// leaves 0…n-1 over to the left.
+import type { ImageMetadata } from 'astro';
+import PhotoPage from './sketchbook/PhotoPage.astro';
+import TextPage from './sketchbook/TextPage.astro';
+
+interface Item {
+  client: string;
+  company?: string;
+  purpose?: string;
+  roles: string[];
+  href?: string;
+  note?: string;
+  accent?: string;
+  image?: ImageMetadata;
+  imageAlt?: string;
+}
+
+interface Props {
+  items: Item[];
+  /** id of the heading that names the sketchbook */
+  labelledby: string;
+}
+
+const { items, labelledby } = Astro.props;
+const n = items.length;
+// Cream paper with a dot grid, like the notebook
+const paper =
+  'bg-paper bg-[radial-gradient(circle,var(--color-paper-dot)_1px,transparent_1.6px)] bg-size-[22px_22px] bg-position-[11px_11px] text-on-paper';
+// Shading towards the spine, so the two pages read as a bound book
+const shadeLeft = 'pointer-events-none absolute inset-y-0 right-0 w-[12%] bg-linear-to-l from-paper-shade to-transparent';
+const shadeRight = 'pointer-events-none absolute inset-y-0 left-0 w-[12%] bg-linear-to-r from-paper-shade to-transparent';
+const control =
+  'grid size-11 cursor-pointer place-items-center rounded-pill border border-border bg-surface text-18 text-text transition-[border-color,opacity] duration-160 ease-out enabled:hover:border-text disabled:cursor-default disabled:opacity-35';
+---
+
+<div class="sketchbook" role="region" aria-roledescription="carousel" aria-labelledby={labelledby}>
+  <!-- Phones and tablets: single pages to swipe through -->
+  <ol class="flex snap-x snap-mandatory gap-4 overflow-x-auto pr-[12%] pb-2 lg:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    {
+      items.map((item, i) => (
+        <li
+          class:list={['relative w-[88%] shrink-0 snap-start overflow-hidden rounded-[18px] shadow-[0_2px_0_var(--color-paper-edge),0_4px_0_var(--color-paper-shade)]', paper]}
+          aria-label={`${i + 1} of ${n}: ${item.client}`}
+        >
+          {/* Plain wrappers, so the pages size to their content here instead of filling a spread */}
+          <div class="[&>div]:pb-4 [&>div>span:last-child]:hidden">
+            <PhotoPage client={item.client} image={item.image} imageAlt={item.imageAlt} note={item.note} pageNumber={i * 2 + 1} eager={i === 0} />
+          </div>
+          <div class="[&>div]:pt-0 [&>div>span]:hidden">
+            <TextPage index={i} {...item} pageNumber={i * 2 + 2} />
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+
+  <!-- From 1080px: an open book with turning pages -->
+  <div class="hidden lg:block">
+    <div class="book-slot ml-auto w-[min(1100px,72vw)] lg:-mr-[2vw]">
+    <div class="book-tilt rotate-[-3deg] will-change-transform">
+    <div class="book relative aspect-[8/5] w-full [perspective:2600px]">
+      {/* The stack of pages under the open spread */}
+      <div class="absolute inset-0 translate-y-2 rounded-[20px] bg-paper-edge shadow-[0_18px_40px_var(--color-book-shadow)]" aria-hidden="true"></div>
+
+      {/* The first case's left page, under everything */}
+      <div class:list={['absolute inset-y-0 left-0 w-1/2 overflow-hidden rounded-l-[18px]', paper]}>
+        {items[0] && <PhotoPage client={items[0].client} image={items[0].image} imageAlt={items[0].imageAlt} note={items[0].note} pageNumber={1} eager />}
+        <span class={shadeLeft} aria-hidden="true"></span>
+      </div>
+
+      {
+        items.map((item, i) => {
+          const next = items[i + 1];
+          return (
+            <div
+              class="book-leaf absolute inset-y-0 left-1/2 w-1/2 origin-left [transform-style:preserve-3d] transition-transform duration-900 ease-[cubic-bezier(0.45,0.05,0.25,1)] motion-reduce:transition-none [&.is-flipped]:[transform:rotateY(-180deg)]"
+              style={`z-index: ${n - i}`}
+              data-client={item.client}
+              aria-roledescription="slide"
+              aria-label={`${i + 1} of ${n}: ${item.client}`}
+            >
+              <div class:list={['absolute inset-0 overflow-hidden rounded-r-[18px] [backface-visibility:hidden]', paper]}>
+                <TextPage index={i} {...item} pageNumber={i * 2 + 2} />
+                <span class={shadeRight} aria-hidden="true" />
+              </div>
+              <div class:list={['absolute inset-0 overflow-hidden rounded-l-[18px] [backface-visibility:hidden] [transform:rotateY(180deg)]', paper]}>
+                {next && <PhotoPage client={next.client} image={next.image} imageAlt={next.imageAlt} note={next.note} pageNumber={i * 2 + 3} />}
+                <span class={shadeLeft} aria-hidden="true" />
+              </div>
+            </div>
+          );
+        })
+      }
+    </div>
+    </div>
+    </div>
+
+    <div class="mt-12 ml-auto flex w-[min(1100px,72vw)] items-center justify-between gap-4 lg:-mr-[2vw]">
+      <button type="button" class:list={['book-prev', control]} aria-label="Previous case">
+        <span aria-hidden="true">←</span>
+      </button>
+      <div class="flex flex-wrap justify-center gap-1">
+        {
+          items.map((item, i) => (
+            <button type="button" class="book-dot group/dot grid size-6 cursor-pointer place-items-center" aria-label={`Show case ${i + 1}: ${item.client}`}>
+              <span class="block size-2 rounded-pill bg-border transition-[background-color,width] duration-160 ease-out group-hover/dot:bg-text-muted group-aria-[current=true]/dot:w-6 group-aria-[current=true]/dot:bg-accent" />
+            </button>
+          ))
+        }
+      </div>
+      <button
+        type="button"
+        class="book-next flex h-11 cursor-pointer items-center gap-3 rounded-pill border border-border bg-surface px-4 text-text transition-[border-color,opacity] duration-160 ease-out enabled:hover:border-text disabled:cursor-default disabled:opacity-35"
+        aria-label="Next case"
+      >
+        <span class="book-next-label text-14 text-text-muted" aria-hidden="true"></span>
+        <span class="text-18" aria-hidden="true">→</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.sketchbook').forEach((root) => {
+    const book = root.querySelector<HTMLElement>('.book');
+    if (!book) return;
+    const leaves = [...book.querySelectorAll<HTMLElement>('.book-leaf')];
+    const dots = [...root.querySelectorAll<HTMLButtonElement>('.book-dot')];
+    const prev = root.querySelector<HTMLButtonElement>('.book-prev')!;
+    const next = root.querySelector<HTMLButtonElement>('.book-next')!;
+    const nextLabel = root.querySelector<HTMLElement>('.book-next-label');
+    const n = leaves.length;
+    let current = 0;
+
+    // Resting stacking order: unturned leaves with the lowest number on top (right side),
+    // turned leaves with the highest number on top (left side)
+    const restZ = (k: number) => (k < current ? k + 1 : n - k);
+
+    const show = (i: number) => {
+      const target = Math.max(0, Math.min(n - 1, i));
+      leaves.forEach((leaf, k) => {
+        const flipped = k < target;
+        if (flipped === leaf.classList.contains('is-flipped')) return;
+        // A turning leaf goes on top of everything until it lands; when several turn at
+        // once, the one that lands on top of its new stack stays on top
+        leaf.style.zIndex = String(2 * n + (flipped ? k : n - k));
+        leaf.classList.toggle('is-flipped', flipped);
+        const land = (e?: TransitionEvent) => {
+          if (e && e.target !== leaf) return;
+          leaf.style.zIndex = String(restZ(k));
+          leaf.removeEventListener('transitionend', land);
+        };
+        leaf.addEventListener('transitionend', land);
+        // Reduced motion has no transition, so land straight away
+        if (parseFloat(getComputedStyle(leaf).transitionDuration) === 0) land();
+      });
+      current = target;
+      // Only the visible right page can be reached by keyboard and screen readers
+      leaves.forEach((leaf, k) => leaf.toggleAttribute('inert', k !== current));
+      dots.forEach((d, k) => (k === current ? d.setAttribute('aria-current', 'true') : d.removeAttribute('aria-current')));
+      prev.disabled = current === 0;
+      next.disabled = current === n - 1;
+      if (nextLabel) nextLabel.textContent = leaves[current + 1] ? `Next: ${leaves[current + 1].dataset.client}` : '';
+    };
+
+    prev.addEventListener('click', () => show(current - 1));
+    next.addEventListener('click', () => show(current + 1));
+    dots.forEach((d, k) => d.addEventListener('click', () => show(k)));
+
+    show(0);
+
+    // Slides up into place from the bottom left (along a diagonal) as the book scrolls in
+    const slot = root.querySelector<HTMLElement>('.book-slot');
+    const tilt = root.querySelector<HTMLElement>('.book-tilt');
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    if (slot && tilt) {
+      let ticking = false;
+      const place = () => {
+        ticking = false;
+        if (reduceMotion.matches) {
+          tilt.style.transform = '';
+          return;
+        }
+        const r = slot.getBoundingClientRect();
+        // 0 while the book is below the screen, 1 once its top is 40% up the screen
+        const t = Math.min(1, Math.max(0, (innerHeight - r.top) / (innerHeight * 0.6)));
+        const e = 1 - Math.pow(1 - t, 3);
+        tilt.style.transform = `translate(${(-14 * (1 - e)).toFixed(2)}vw, ${(22 * (1 - e)).toFixed(2)}vh) rotate(${(-3 - 9 * (1 - e)).toFixed(2)}deg)`;
+      };
+      const request = () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(place);
+        }
+      };
+      addEventListener('scroll', request, { passive: true });
+      addEventListener('resize', request);
+      place();
+    }
+  });
+</script>

@@ -17,6 +17,8 @@ tldr:
   role: UX/UI Designer, and Agile Team Lead from 2022
   timeline: 2019–2023
   problem: Qmatic needed a new cloud platform for appointments, which had to work for very different clients, both public and private sector.
+  # Stakeholders tile in the summary bento: one per line, e.g. - Residual value analysts
+  stakeholders: ["[stakeholders]"]
   whatIDid: Researched, prototyped and designed both the customer-facing booking and the staff tools, owned the design system backlog and introduced Lean UX to the development team.
   result: "[Add launch scope or adoption, e.g. number of customers or markets.]"
 links:

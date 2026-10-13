@@ -17,6 +17,8 @@ tldr:
   role: Product designer
   timeline: "2025"
   problem: Ziklo had built a tool for setting cars' residual values, but it didn't match how the team actually worked, and it hadn't been adopted.
+  # Stakeholders tile in the summary bento: one per line, e.g. - Residual value analysts
+  stakeholders: [Residual value analysts, Credit council, Product manager]
   whatIDid: Mapped the real valuation process with users, adapted the existing tool to it within the technical constraints, and supported the rollout.
   result: "[Add adoption, e.g. the team now runs its valuation process in the tool.]"
 ---

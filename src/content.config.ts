@@ -3,7 +3,7 @@ import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
 // One folder per case study: src/content/work/<slug>/index.md, images beside it.
-// The ILP case is deliberately not here until ILP approves it (see CLAUDE.md).
+// The ILP case is built only from the slides ILP approved in writing (see CLAUDE.md).
 const work = defineCollection({
   loader: glob({
     base: './src/content/work',
@@ -15,10 +15,10 @@ const work = defineCollection({
       // Hero title, written as an outcome
       title: z.string(),
       client: z.string(),
-      // Position on the home page and in "Next case" (ILP's "Coming soon" card always comes first)
+      // Position on the home page and in "Next case" ("Coming soon" cards always come first)
       order: z.number(),
       // Colour set from tokens.css: [data-case="<accent>"]
-      accent: z.enum(['smartopt', 'qmatic', 'lansforsakringar', 'ziklo']),
+      accent: z.enum(['ilp', 'smartopt', 'qmatic', 'lansforsakringar', 'ziklo']),
       // One line for the home page card, so recruiters see the result before they click
       summary: z.string(),
       // Search engines and link previews
@@ -35,6 +35,8 @@ const work = defineCollection({
         role: z.string(),
         timeline: z.string().optional(),
         team: z.string().optional(),
+        // Who Malin worked with and for, shown as a list in the summary bento
+        stakeholders: z.array(z.string()).default([]),
         problem: z.string(),
         whatIDid: z.string(),
         result: z.string().optional(),

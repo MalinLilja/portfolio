@@ -1,5 +1,10 @@
 {
   "_readme": "Strings that must never be published. Matching is case-insensitive. Add ILP's internal system names, internal hostnames and project code names to ilpInternal.",
-  "ilpInternal": [],
-  "other": ["residential", "@amply."]
+  "ilpInternal": [
+    "solsten"
+  ],
+  "other": [
+    "residential",
+    "@amply."
+  ]
 }

@@ -1,0 +1,81 @@
+---
+// Right page of a sketchbook spread, as a scrapbook: purpose on a white card with a star
+// sticker in the case's colour, the company on a kraft card with a round initial sticker,
+// the role as a "HELLO" name tag, and the link to the case as a ticket stub. Each piece is
+// slightly turned, as if stuck on by hand.
+import { hideGaps } from '../../lib/brackets';
+
+interface Props {
+  index: number;
+  client: string;
+  company?: string;
+  purpose?: string;
+  roles: string[];
+  href?: string;
+  note?: string;
+  accent?: string;
+  pageNumber: number;
+}
+
+const { index, client, roles, href, note, accent, pageNumber } = Astro.props;
+const purpose = hideGaps(Astro.props.purpose);
+const about = hideGaps(Astro.props.company).split(', ').slice(1).join(', ');
+const initial = client.trim().charAt(0).toUpperCase();
+// Paper cards lifted a little off the page
+const card = 'relative shadow-[0_1px_2px_var(--color-paper-shade),0_6px_14px_var(--color-paper-shade)]';
+// Die-cut stickers: a white border around the shape, and a small shadow
+const sticker = '[paint-order:stroke] stroke-card [stroke-linejoin:round] drop-shadow-[0_2px_2px_var(--color-paper-shade)]';
+---
+
+<div class="relative flex h-full flex-col gap-5 px-[8%] pt-[9%] pb-[10%] text-on-paper" data-case={accent}>
+  <!-- Purpose: white card with a star sticker -->
+  <div class:list={[card, '-rotate-[1.2deg] bg-card px-6 pt-5 pb-6']}>
+    <svg class:list={['absolute -top-5 -right-4 size-14 rotate-[14deg] fill-case-accent stroke-[7]', sticker]} viewBox="-6 -6 112 112" aria-hidden="true">
+      <path d="M50 0C54 36 64 46 100 50C64 54 54 64 50 100C46 64 36 54 0 50C36 46 46 36 50 0Z" />
+    </svg>
+    <p class="font-support text-14 text-on-paper-muted">{String(index + 1).padStart(2, '0')} · Purpose</p>
+    {purpose && <p class="mt-3 font-headline text-18 leading-snug font-medium text-balance">{purpose}</p>}
+  </div>
+
+  <div class="grid items-start gap-5 sm:grid-cols-2">
+    <!-- Company: kraft card with a round initial sticker -->
+    <div class:list={[card, 'rotate-[1.6deg] bg-kraft px-5 pt-6 pb-5']}>
+      <svg class:list={['absolute -top-4 -left-3 size-11 -rotate-[8deg]', sticker]} viewBox="-4 -4 48 48" aria-hidden="true">
+        <circle cx="20" cy="20" r="20" class="fill-case-accent stroke-[4]" />
+        <text x="20" y="21" text-anchor="middle" dominant-baseline="central" class="fill-on-paper font-display text-[20px] font-bold">{initial}</text>
+      </svg>
+      <p class="font-support text-14 text-on-paper/70">Company</p>
+      <p class="mt-1 font-display text-17 font-heading wrap-anywhere">{client}</p>
+      {about && <p class="mt-1 text-13 leading-snug text-on-paper/80">{about}</p>}
+    </div>
+
+    <!-- Role: a "HELLO" name tag -->
+    <div class:list={[card, '-rotate-[2deg] overflow-hidden rounded-[10px] bg-card']}>
+      <div class="bg-name-tag px-4 pt-2 pb-1.5 text-center text-on-name-tag">
+        <p class="font-display text-17 leading-none font-heading tracking-wide uppercase">Hello</p>
+        <p class="mt-1 text-13 leading-tight">my role was</p>
+      </div>
+      <ul class="flex flex-wrap justify-center gap-x-3 gap-y-1 px-4 pt-3 pb-4 text-center font-headline text-17 leading-snug font-medium" aria-label="My role">
+        {roles.map((role) => <li>{role}</li>)}
+      </ul>
+    </div>
+  </div>
+
+  {
+    href ? (
+      <a
+        href={href}
+        class:list={[card, 'group mt-auto flex rotate-[0.8deg] items-stretch self-start bg-on-paper text-14 font-medium text-paper no-underline']}
+      >
+        <span class="px-5 py-3">Read the case</span>
+        {/* Ticket stub, torn off along the dashes */}
+        <span class="flex items-center border-l-2 border-dashed border-paper/40 px-4" aria-hidden="true">
+          <span class="transition-transform duration-160 ease-out group-hover:translate-x-1">→</span>
+        </span>
+      </a>
+    ) : (
+      <p class="mt-auto font-support text-14 text-on-paper-muted">{note}</p>
+    )
+  }
+  <span class="absolute right-[7%] bottom-[4%] font-support text-13 text-on-paper-muted tabular-nums" aria-hidden="true">{pageNumber}</span>
+</div>

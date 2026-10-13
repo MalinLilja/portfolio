@@ -17,6 +17,8 @@ tldr:
   role: UX/UI designer and project manager, and product owner for Personuppgiftskollen
   timeline: 2023–2025
   problem: Internal processes needed to be streamlined and aligned across teams.
+  # Stakeholders tile in the summary bento: one per line, e.g. - Residual value analysts
+  stakeholders: ["[stakeholders]"]
   whatIDid: Owned design and project management for 5 tailored internal services, from new ideas to ongoing development.
   result: "[Add one outcome, e.g. time saved, processes digitised or number of internal users.]"
 ---

@@ -49,6 +49,21 @@
   --color-on-liquid: #150f2e;
   --color-on-liquid-muted: rgb(21 15 46 / 0.78);
 
+  /* Sketchbook (Selected work): cream dot-grid paper */
+  --color-paper: #f4eed9;
+  --color-paper-edge: #ddd4b8;
+  --color-paper-dot: rgb(70 62 40 / 0.45);
+  --color-paper-shade: rgb(60 48 20 / 0.16);
+  --color-paper-tape: rgb(255 255 255 / 0.55);
+  --color-on-paper: #1f1c15;
+  --color-on-paper-muted: #5e584a;
+  --color-book-shadow: rgb(0 0 0 / 0.45);
+  /* Scrapbook cards and stickers on the sketchbook pages */
+  --color-card: #fffdf6;
+  --color-kraft: #d9c29c;
+  --color-name-tag: #6d5ccf;
+  --color-on-name-tag: #ffffff;
+
   /* Image zoom overlay (same on every page) */
   --color-overlay: rgb(8 8 12 / 0.94);
   --color-overlay-text: #f3f2f8;
@@ -131,6 +146,12 @@
 [data-case="qmatic"] {
   --color-case-accent: #5ac21e;
   --color-case-accent-strong: #5ac21e;
+}
+
+/* ILP's own brand is black and white, so the case uses the site's light liquid violet */
+[data-case="ilp"] {
+  --color-case-accent: var(--color-liquid-mid);
+  --color-case-accent-strong: var(--color-liquid-mid);
 }
 
 [data-case="lansforsakringar"] {

@@ -1,0 +1,46 @@
+---
+// Left page of a sketchbook spread: the case picture taped onto dot-grid paper.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  client: string;
+  image?: ImageMetadata;
+  imageAlt?: string;
+  note?: string;
+  pageNumber: number;
+  eager?: boolean;
+}
+
+const { client, image, imageAlt, note, pageNumber, eager = false } = Astro.props;
+---
+
+<div class="relative flex h-full flex-col justify-center px-[9%] py-[12%]">
+  <figure class="relative -rotate-[1.5deg]">
+    {/* A strip of tape holding the picture */}
+    <span
+      class="absolute -top-3 left-1/2 z-10 h-6 w-24 -translate-x-1/2 rotate-[2deg] bg-paper-tape shadow-[0_1px_2px_var(--color-paper-shade)]"
+      aria-hidden="true"
+    ></span>
+    <div class="aspect-16/11 overflow-hidden bg-on-paper shadow-[0_6px_18px_var(--color-paper-shade),0_1px_3px_var(--color-paper-shade)]">
+      {
+        image ? (
+          <Image
+            src={image}
+            alt={imageAlt ?? ''}
+            widths={[480, 720, 1080]}
+            sizes="(min-width: 1080px) 440px, 90vw"
+            loading={eager ? 'eager' : 'lazy'}
+            class="h-full! w-full! max-w-none! object-cover object-left-top"
+          />
+        ) : (
+          <div class="grid size-full place-items-center bg-[linear-gradient(140deg,var(--color-liquid-deep),var(--color-liquid-light)_55%,var(--color-liquid-mid))]">
+            <span class="eyebrow text-on-liquid">{note}</span>
+          </div>
+        )
+      }
+    </div>
+    <figcaption class="mt-4 font-support text-14 text-on-paper-muted">{client}</figcaption>
+  </figure>
+  <span class="absolute bottom-[5%] left-[7%] font-support text-13 text-on-paper-muted tabular-nums" aria-hidden="true">{pageNumber}</span>
+</div>

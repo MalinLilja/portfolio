@@ -5,8 +5,8 @@
 //   node scripts/check-copy.mjs --dist   also checks the built site in dist/
 //
 // Fails on: internal ILP names, the Amply email, "residential", Swedish personal
-// identity numbers, the reference letter, an ILP case in the content folder, and
-// (in dist/) any [bracket] gap that reached a page.
+// identity numbers, the reference letter, and (in dist/) any [bracket] gap that
+// reached a page. The ILP case is allowed: ILP approved its slides in writing.
 
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, relative, extname, basename } from 'node:path';
@@ -49,16 +49,10 @@ for (const dir of sources) {
   }
 }
 
-const workDir = join(root, 'src/content/work');
-if (existsSync(workDir) && readdirSync(workDir).some((d) => /^ilp/i.test(d))) {
-  report(workDir, 'an ILP case is in the content folder; keep it out until ILP has approved it in writing');
-}
-
 if (checkDist) {
   const dist = join(root, 'dist');
   if (!existsSync(dist)) report(dist, 'missing; run the build first');
   for (const file of walk(dist)) {
-    if (/\/work\/ilp/i.test(file.replace(/\\/g, '/'))) report(file, 'ILP case page was built');
     if (extname(file) !== '.html') continue;
     const html = readFileSync(file, 'utf8');
     checkText(file, html);
