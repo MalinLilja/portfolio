@@ -107,8 +107,8 @@
 
   /* Motion */
   --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
-  /* The company strip: two copies of the list side by side, moved left by one copy */
-  --animate-marquee: marquee 30s linear infinite;
+  /* The company strip: copies of the list side by side, moved left by half of them */
+  --animate-marquee: marquee 50s linear infinite;
   @keyframes marquee {
     to {
       transform: translateX(-50%);

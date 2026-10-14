@@ -25,29 +25,30 @@ const { items, id = 'companies', class: className } = Astro.props;
       {/* Edges fade out, so names glide in and out instead of being cut off */}
       <div class="[mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)] motion-reduce:[mask-image:none]">
         <div class="flex w-max hover:[animation-play-state:paused] motion-safe:animate-marquee motion-reduce:w-auto motion-reduce:justify-center">
-          {[0, 1].map((copy) => (
+          {/* Four copies, moved left by half (two copies), so even a short list fills wide screens */}
+          {[0, 1, 2, 3].map((copy) => (
             <ul
               class:list={[
                 'flex shrink-0 items-center gap-16 pr-16 md:gap-24 md:pr-24',
-                copy === 1 && 'motion-reduce:hidden',
+                copy > 0 && 'motion-reduce:hidden',
                 'motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:gap-x-12 motion-reduce:gap-y-6 motion-reduce:px-(--gutter) motion-reduce:pr-(--gutter)',
               ]}
-              aria-hidden={copy === 1 ? 'true' : undefined}
+              aria-hidden={copy > 0 ? 'true' : undefined}
             >
               {items.map((company) => (
                 <li class="flex items-center gap-3 whitespace-nowrap opacity-75">
                   {company.logo && (
-                    // Wordmarks 28px tall, marks next to a name 36px, unless the company sets its own
+                    // Wordmarks 22px tall, marks next to a name 28px, unless the company sets its own
                     <Image
                       src={company.logo}
                       alt={company.logoOnly ? company.name : ''}
-                      height={company.logoHeight ?? (company.logoOnly ? 28 : 36)}
-                      width={Math.round((company.logo.width * (company.logoHeight ?? (company.logoOnly ? 28 : 36))) / company.logo.height)}
+                      height={company.logoHeight ?? (company.logoOnly ? 22 : 28)}
+                      width={Math.round((company.logo.width * (company.logoHeight ?? (company.logoOnly ? 22 : 28))) / company.logo.height)}
                       layout="fixed"
                       class="h-auto! max-w-none!"
                     />
                   )}
-                  {!(company.logo && company.logoOnly) && <span class="font-display text-22 font-heading text-text">{company.name}</span>}
+                  {!(company.logo && company.logoOnly) && <span class="font-display text-18 font-heading text-text">{company.name}</span>}
                 </li>
               ))}
             </ul>

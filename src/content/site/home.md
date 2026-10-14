@@ -32,8 +32,6 @@ experience:
 companies:
   - name: ILP VFX
     logo: ./logos/ilp.png
-  - name: Amply
-    logo: ./logos/amply.png
   - name: Qmatic
     logo: ./logos/qmatic.png
     logoOnly: true
@@ -46,8 +44,7 @@ companies:
   - name: Länsförsäkringar Göteborg och Bohuslän
     logo: ./logos/lansforsakringar.png
     logoOnly: true
-    logoHeight: 40
-  - name: InUse
+    logoHeight: 32
 # Cases that can't be shown yet. Shown first, as a card that doesn't link anywhere.
 # Example:
 #   - client: Company name
