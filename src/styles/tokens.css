@@ -108,6 +108,16 @@
   /* Motion */
   --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
   /* The company strip: copies of the list side by side, moved left by half of them */
+  /* The case card glow: its liquid background drifting slowly behind the card */
+  --animate-wisp: wisp 5s ease-in-out infinite alternate;
+  @keyframes wisp {
+    from {
+      transform: translate(-3%, 2%) scale(1.05) rotate(-2deg);
+    }
+    to {
+      transform: translate(3%, -2%) scale(1.15) rotate(2deg);
+    }
+  }
   --animate-marquee: marquee 50s linear infinite;
   @keyframes marquee {
     to {

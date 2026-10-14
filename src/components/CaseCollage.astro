@@ -14,21 +14,39 @@ interface Props {
   eager?: boolean;
   // Leave out the gradient, when the card already has it behind everything (CaseCard)
   bare?: boolean;
+  // Let the pictures stick out above the area's top edge (never down over the card's text).
+  // "stacked" only does this while the text is under the pictures (below lg), not when it
+  // sits beside them.
+  spill?: 'always' | 'stacked';
 }
 
-const { images, alt = '', eager = false, bare = false } = Astro.props;
+const { images, alt = '', eager = false, bare = false, spill } = Astro.props;
 
 // Left, right and a smaller one in front in the middle. Sized by the area's height (16:10,
 // capped in width on narrow cards) so they spread out on wide, short cards too. Rotation and
-// hover growth are separate properties (rotate, scale), so they combine.
-const slots = [
-  'left-[4%] top-[9%] h-[70%] max-w-[58%] -rotate-[5deg] z-10',
-  'right-[4%] top-[16%] h-[74%] max-w-[60%] rotate-[3.5deg] z-20',
-  'left-[33%] bottom-[5%] h-[46%] max-w-[40%] -rotate-[1.5deg] z-30',
+// hover growth are separate properties (rotate, scale), so they combine. The small one always
+// stays inside, so it never covers the card's title.
+const contained = [
+  'left-[4%] top-[9%] h-[70%] max-w-[58%]',
+  'right-[4%] top-[16%] h-[74%] max-w-[60%]',
+  'left-[33%] bottom-[5%] h-[46%] max-w-[40%]',
 ];
+const spilling = [
+  'left-[3%] -top-[12%] h-[84%] max-w-[58%]',
+  'right-[3%] -top-[5%] h-[90%] max-w-[62%]',
+  'left-[31%] bottom-[6%] h-[44%] max-w-[38%]',
+];
+const spillingBelowLg = [
+  'left-[3%] -top-[12%] h-[84%] max-w-[58%] lg:top-[9%] lg:h-[70%]',
+  'right-[3%] -top-[5%] h-[90%] max-w-[62%] lg:top-[16%] lg:h-[74%]',
+  'left-[31%] bottom-[6%] h-[44%] max-w-[38%] lg:bottom-[5%] lg:h-[46%]',
+];
+const place = spill === 'always' ? spilling : spill === 'stacked' ? spillingBelowLg : contained;
+const tilt = ['-rotate-[5deg] z-10', 'rotate-[2deg] z-20', '-rotate-[1.5deg] z-30'];
+const slots = place.map((p, i) => `${p} ${tilt[i]}`);
 ---
 
-<div class:list={['relative size-full overflow-hidden', !bare && 'bg-liquid-mid']}>
+<div class:list={['relative size-full', !spill && 'overflow-hidden', !bare && 'bg-liquid-mid']}>
   {!bare && <Image src={gradient} alt="" widths={[640, 1080, 1600]} sizes="(min-width: 1080px) 1100px, 100vw" loading={eager ? 'eager' : 'lazy'} class="absolute inset-0 size-full! max-w-none! object-cover" />}
   {
     slots.map((slot, i) => {
@@ -36,7 +54,7 @@ const slots = [
       return (
         <div
           class:list={[
-            'absolute aspect-16/10 overflow-hidden rounded-[10px] shadow-[0_18px_40px_-12px_color-mix(in_oklab,var(--color-bg)_70%,transparent)] transition-[scale] duration-500 ease-out group-hover:scale-[1.04] group-focus-within:scale-[1.04] motion-reduce:transition-none',
+            'pointer-events-none absolute aspect-16/10 overflow-hidden rounded-[10px] shadow-[0_18px_40px_-12px_color-mix(in_oklab,var(--color-bg)_70%,transparent)] transition-[scale] duration-500 ease-out group-hover:scale-[1.04] group-focus-within:scale-[1.04] motion-reduce:transition-none',
             slot,
             image ? 'bg-bg' : 'border-2 border-dashed border-on-liquid-muted/50 bg-surface/15 shadow-none',
           ]}

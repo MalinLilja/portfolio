@@ -51,7 +51,11 @@ const purpose = hideGaps(item.purpose);
 // The text part is frosted glass over the liquid background, which runs under the whole card
 const glass = 'relative border-border bg-surface/80 backdrop-blur-xl';
 const glow =
-  'border-border transition-[border-color,box-shadow] duration-300 ease-out hover:border-case-accent hover:shadow-[0_0_56px_-10px_color-mix(in_oklab,var(--color-case-accent-strong)_70%,transparent)] focus-within:border-case-accent focus-within:shadow-[0_0_56px_-10px_color-mix(in_oklab,var(--color-case-accent-strong)_70%,transparent)]';
+  'border-border transition-[border-color] duration-300 ease-out hover:border-case-accent focus-within:border-case-accent';
+// Behind the card: its own liquid background, blurred and drifting slowly, so the glow is
+// wispy like the hero. It fades in on hover and keyboard focus.
+const wisp =
+  'pointer-events-none absolute -inset-16 -z-10 overflow-hidden rounded-[64px] opacity-0 blur-[32px] saturate-150 transition-opacity duration-500 ease-out [mask-image:radial-gradient(farthest-side,black_80%,transparent)] group-hover:opacity-100 group-focus-within:opacity-100';
 ---
 
 {
@@ -59,12 +63,20 @@ const glow =
     // The deck version: just the picture, with the company, time, case title and the link under it
     <article
       data-case={item.accent}
-      class:list={['group relative flex h-full flex-col overflow-hidden rounded-media border bg-liquid-mid', item.href ? glow : 'border-dashed border-stars']}
+      class:list={['group relative isolate flex h-full flex-col rounded-media border', item.href ? glow : 'border-dashed border-stars']}
     >
-      <Image src={item.background ?? gradient} alt="" widths={[640, 1080, 1600]} sizes="(min-width: 1080px) 1100px, 100vw" loading={eager ? 'eager' : 'lazy'} class="absolute inset-0 size-full! max-w-none! object-cover" />
-      <div class="relative min-h-0 flex-1">
+      {item.href && (
+        <div class={wisp} aria-hidden="true">
+          <Image src={item.background ?? gradient} alt="" widths={[640]} sizes="640px" loading="lazy" class="size-full! max-w-none! object-cover group-hover:motion-safe:animate-wisp" />
+        </div>
+      )}
+      {/* Only the background is clipped to the card, so the pictures can stick out of it */}
+      <div class="absolute inset-0 overflow-hidden rounded-media bg-liquid-mid">
+        <Image src={item.background ?? gradient} alt="" widths={[640, 1080, 1600]} sizes="(min-width: 1080px) 1100px, 100vw" loading={eager ? 'eager' : 'lazy'} class="absolute inset-0 size-full! max-w-none! object-cover" />
+      </div>
+      <div class="relative z-10 min-h-0 flex-1">
         {item.images ? (
-          <CaseCollage images={item.images} alt={item.imageAlt} eager={eager} bare />
+          <CaseCollage images={item.images} alt={item.imageAlt} eager={eager} bare spill="always" />
         ) : (
           <div class="grid size-full place-items-center bg-[linear-gradient(140deg,var(--color-liquid-deep),var(--color-liquid-light)_55%,var(--color-liquid-mid))]">
             <span class="eyebrow text-on-liquid">{item.note}</span>
@@ -74,7 +86,7 @@ const glow =
             their own link (the title link is the one for keyboards and screen readers) */}
         {item.href && <a href={item.href} class="absolute inset-0 z-40" tabindex="-1" aria-hidden="true" />}
       </div>
-      <div class:list={['flex items-end justify-between gap-6 border-t p-6', glass]}>
+      <div class:list={['flex items-end justify-between gap-6 rounded-b-media border-t p-6', glass]}>
         <div class="grid min-w-0 gap-2">
           <p class="flex items-center gap-3 text-14 text-text-muted">
             {item.logo && <Image src={item.logo} alt="" widths={[48, 96]} sizes="24px" class="size-6! rounded-pill bg-text object-cover" />}
@@ -107,12 +119,20 @@ const glow =
     // The full version (phones, tablets, reduced motion): picture, then the case summary
     <article
       data-case={item.accent}
-      class:list={['group relative grid overflow-hidden rounded-media border bg-liquid-mid lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]', item.href ? glow : 'border-dashed border-stars']}
+      class:list={['group relative isolate grid rounded-media border lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]', item.href ? glow : 'border-dashed border-stars']}
     >
-      <Image src={item.background ?? gradient} alt="" widths={[640, 1080, 1600]} sizes="(min-width: 1080px) 1200px, 100vw" loading={eager ? 'eager' : 'lazy'} class="absolute inset-0 size-full! max-w-none! object-cover" />
-      <div class="relative aspect-16/10 lg:aspect-auto lg:min-h-[28rem]">
+      {item.href && (
+        <div class={wisp} aria-hidden="true">
+          <Image src={item.background ?? gradient} alt="" widths={[640]} sizes="640px" loading="lazy" class="size-full! max-w-none! object-cover group-hover:motion-safe:animate-wisp" />
+        </div>
+      )}
+      {/* Only the background is clipped to the card, so the pictures can stick out of it */}
+      <div class="absolute inset-0 overflow-hidden rounded-media bg-liquid-mid">
+        <Image src={item.background ?? gradient} alt="" widths={[640, 1080, 1600]} sizes="(min-width: 1080px) 1200px, 100vw" loading={eager ? 'eager' : 'lazy'} class="absolute inset-0 size-full! max-w-none! object-cover" />
+      </div>
+      <div class="relative z-10 aspect-16/10 lg:aspect-auto lg:min-h-[28rem]">
         {item.images ? (
-          <CaseCollage images={item.images} alt={item.imageAlt} eager={eager} bare />
+          <CaseCollage images={item.images} alt={item.imageAlt} eager={eager} bare spill="stacked" />
         ) : (
           <div class="grid size-full place-items-center bg-[linear-gradient(140deg,var(--color-liquid-deep),var(--color-liquid-light)_55%,var(--color-liquid-mid))]">
             <span class="eyebrow text-on-liquid">{item.note}</span>
@@ -123,7 +143,7 @@ const glow =
         {item.href && <a href={item.href} class="absolute inset-0 z-40" tabindex="-1" aria-hidden="true" />}
       </div>
 
-      <div class:list={['flex min-h-0 flex-col gap-5 border-t p-6 md:p-8 lg:border-t-0 lg:border-l', glass]}>
+      <div class:list={['flex min-h-0 flex-col gap-5 rounded-b-media border-t p-6 md:p-8 lg:rounded-none lg:rounded-r-media lg:border-t-0 lg:border-l', glass]}>
         <p class="flex items-center gap-3 text-14 text-text-muted">
           {item.logo && <Image src={item.logo} alt="" widths={[48, 96]} sizes="24px" class="size-6! rounded-pill bg-text object-cover" />}
           <span class="font-display font-heading text-text">{item.client}</span>
