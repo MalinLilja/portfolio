@@ -16,8 +16,12 @@ roles: [Senior UX designer, Design lead]
 purpose: "Bring crewing and bidding into one planning platform, replacing a legacy system and disconnected spreadsheets."
 hero: ./all-crews.webp
 cardBackground: ./card-background.webp
-# Placeholders for now: Malin will pick the card pictures
-cardImages: []
+# Card pictures: the approved All crews view, plus a crew detail view and the ILP banner
+# (both approved by ILP in writing, October 2026)
+cardImages:
+  - ./all-crews.webp
+  - ./crew-detail.webp
+  - ./ilp-banner.webp
 logo: ./logo.png
 heroAlt: A dark timeline view of all crews, with shows as coloured bars from April 2026 to February 2027, FX supervisor slots under each show, and a list of people below. Names are masked.
 tldr:
