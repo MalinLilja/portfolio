@@ -1,6 +1,6 @@
 ---
 // Case study summary as a bento grid: the main picture as the biggest tile, then purpose,
-// company, role, timeline, stakeholders, team, what I did and result. Replaces the old TL;DR box.
+// company, role, timeline, what I did, team and stakeholders (one tile) and result. Replaces the old TL;DR box.
 // Tiles whose text is still a [gap] are left out, and the grid closes up around them.
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
@@ -81,21 +81,16 @@ const widths = [...[480, 720, 1080, 1440].filter((w) => w < hero.width), hero.wi
   </BentoTile>
 
   {
-    stakeholders.length > 0 && (
-      <BentoTile label="Stakeholders" class="md:col-span-2">
-        <ul class="flex flex-wrap gap-2">
-          {stakeholders.map((s) => (
-            <li class="rounded-pill border border-border px-3 py-1 text-13 text-text">{s}</li>
-          ))}
-        </ul>
-      </BentoTile>
-    )
-  }
-
-  {
-    team && (
-      <BentoTile label="Team" class:list={['md:col-span-2', stakeholders.length > 0 && 'lg:col-span-4']}>
-        <p>{team}</p>
+    (team || stakeholders.length > 0) && (
+      <BentoTile label={team && stakeholders.length > 0 ? 'Team and stakeholders' : team ? 'Team' : 'Stakeholders'} class="md:col-span-2">
+        {team && <p>{team}</p>}
+        {stakeholders.length > 0 && (
+          <ul class:list={['flex flex-wrap gap-2', team && 'mt-2']} aria-label="Stakeholders">
+            {stakeholders.map((s) => (
+              <li class="rounded-pill border border-border px-3 py-1 text-13 text-text">{s}</li>
+            ))}
+          </ul>
+        )}
       </BentoTile>
     )
   }

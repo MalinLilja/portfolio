@@ -63,7 +63,9 @@ I had a strong impact on how the product took shape. Together with a team of 3â€
 - Made it possible for crewing to draft key artists on a daily, weekly and monthly basis, and to group and filter them flexibly to get a good overview of the plan and its options
 - Made it possible to assign these slots to people synced from the HR system, in a few clicks
 
-![Four screens from the planning platform: crewing per discipline with availability, a forecast of capacity per show, a people list, and a show's crew on a timeline.](./planning-screens.webp "Crewing, forecast, people and crew views")
+![Concept sketch of crewing per discipline: each person's availability and booked days per day, with time off and the shows they're booked on.](./concept-crewing.webp "Concept sketch: crewing per discipline") ![Concept sketch of the forecast: a stacked chart of capacity per show over the coming weeks, above people needed and available per discipline.](./concept-forecast.webp "Concept sketch: forecast")
+
+![Concept sketch of the people list: a recruitment chart above a table of artists with role, discipline, current show and who they report to.](./concept-people.webp "Concept sketch: people") ![Concept sketch of a show's crew on a timeline, grouped by discipline, with unassigned slots and requests.](./concept-crew.webp "Concept sketch: crew")
 
 â€¦and a lot of supporting deliverables, such as:
 
