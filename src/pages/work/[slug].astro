@@ -34,7 +34,7 @@ const timeline = hideGaps(data.tldr.timeline);
   <article>
     {/* Liquid header in the case's own colours (tokens.css → [data-case]): the client name
         big, then the case title */}
-    <LiquidHero labelledby="case-title">
+    <LiquidHero labelledby="case-title" lift>
       <a class="inline-flex gap-2 py-2 font-medium text-on-liquid-muted no-underline hover:text-on-liquid" href="/#work"
         ><span aria-hidden="true">←</span> All work</a
       >
@@ -48,10 +48,11 @@ const timeline = hideGaps(data.tldr.timeline);
       >
         {data.client}
       </p>
-      <h1 id="case-title" class="mt-[clamp(32px,6vh,72px)] max-w-[24ch] font-display text-32 leading-[1.15] font-heading text-balance md:text-48">{data.title}</h1>
+      <h1 id="case-title" class="mt-6 max-w-[24ch] md:mt-8 font-display text-32 leading-[1.15] font-heading text-balance md:text-48">{data.title}</h1>
     </LiquidHero>
 
-    <div class="container-page grid gap-8">
+    {/* Pulled up over the bottom of the liquid header; the bento's tiles are frosted glass */}
+    <div class="relative z-30 container-page -mt-[clamp(140px,22vh,240px)] grid gap-8">
       <CaseBento hero={data.hero} heroAlt={data.heroAlt} roles={data.roles ?? []} purpose={data.purpose} tldr={data.tldr} />
       {data.process && <ProcessStepper steps={data.process} />}
       {

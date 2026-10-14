@@ -8,7 +8,9 @@ interface Props {
 const { label, class: className } = Astro.props;
 ---
 
-<div class:list={['flex min-w-0 flex-col gap-2 rounded-media border border-border bg-surface p-5 md:p-6', className]}>
+{/* Frosted glass, so the case page's liquid header shows through where the bento overlaps it.
+    Dark enough for AA contrast on muted text, even over the lightest liquid. */}
+<div class:list={['flex min-w-0 flex-col gap-2 rounded-media border border-border bg-surface/80 p-5 backdrop-blur-xl md:p-6', className]}>
   {label && <span class="eyebrow text-14">{label}</span>}
   <slot />
 </div>

@@ -13,9 +13,11 @@
 interface Props {
   // Id of the heading that names the section
   labelledby?: string;
+  // Keep the text clear of the dark fade at the bottom (case pages, where nothing overlaps it)
+  lift?: boolean;
 }
 
-const { labelledby = 'positioning' } = Astro.props;
+const { labelledby = 'positioning', lift = false } = Astro.props;
 ---
 
 <section
@@ -28,7 +30,7 @@ const { labelledby = 'positioning' } = Astro.props;
   >
     <canvas class="liquid-canvas absolute inset-0 size-full"></canvas>
   </div>
-  <div class="relative z-30 container-page pt-16 pb-[calc(var(--hero-fade)*0.6)]">
+  <div class:list={['relative z-30 container-page pt-16', lift ? 'pb-[calc(var(--hero-fade)*1.1)]' : 'pb-[calc(var(--hero-fade)*0.6)]']}>
     <slot />
   </div>
 </section>
