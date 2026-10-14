@@ -34,7 +34,7 @@ links:
 
 ## The problem
 
-A voyage's earnings depend on many things at once: the ship, the route, the market, the next voyage and days in port. Weighing all of them is hard, so speed and fuel orders are often far from the most profitable option.
+A voyage's earnings depend on many things at once: the ship, the route, the market, the next voyage and days in port. Weighing all of of this can be difficult, so speed and fuel orders are often far from the most profitable option.
 
 Optimum Earnings had a calculation method that could find the optimum. The question was whether it could become an app that shipping teams would actually use.
 
@@ -65,8 +65,8 @@ The pre-study gave the client a service concept and specifications, which they u
 ## Outcome
 
 - Went from an expert calculation method to a launched product
-- A design system and main flows that the team could build on
-- [Add a key design decision, e.g. how you made complex calculations understandable]
+- A lightweight design system and UI flows for the main featues agreed on
+- 
 
 ## Reflection
 

@@ -51,7 +51,8 @@ During the adoption phase of the project I assisted with testing and user guidan
 ## Outcome
 
 - A tool restructured around the team's actual valuation process
-- [Add adoption or feedback from users]
+- A visual representation of the scorecard, making sense of the model behind it
+- Ziklo is now taking the application in-house, the users are embracing it!
 
 ## Reflection
 
