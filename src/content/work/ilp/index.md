@@ -32,7 +32,7 @@ tldr:
   # problem, whatIDid and result: drafts by Claude from the slides, rewrite freely
   problem: Bidding and crewing lived in a legacy system and separate spreadsheets, so no one could see what had changed or which scenarios were possible.
   whatIDid: Collected the user research in a living service blueprint, designed the modules with the product manager and developers, and built a design system based on shadcn.
-  result: Delivered a people and skills module, a bid import module, and drafting and assignment of key artists, replacing the manually updated spreadsheets.
+  result: Delivered a people and skills module, a bid import module, and drafting and assignment of key artists, replacing the manually updated spreadsheets. Set the overall direction of how the product would grow conceptually.
 links: []
 ---
 

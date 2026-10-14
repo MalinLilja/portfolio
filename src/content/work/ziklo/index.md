@@ -23,6 +23,7 @@ tldr:
   timeline: "2025"
   problem: Ziklo had built a tool for setting cars' residual values, but it didn't match how the team actually worked, and it hadn't been adopted.
   # Stakeholders tile in the summary bento: one per line, e.g. - Residual value analysts
+  team: Only designer with 2-3 developers
   stakeholders: [Residual value analysts, Credit council, Product manager]
   whatIDid: Mapped the real valuation process with users, adapted the existing tool to it within the technical constraints, and supported the rollout.
   result: The team now runs its valuation process in the tool and Ziklo is now taking the application in-house, the users are embracing it!
