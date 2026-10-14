@@ -1,7 +1,8 @@
 ---
 // One case as a card: the case pictures over the liquid background (CaseCollage), then company and timeline, the case title, its
-// purpose, with role badges and a link to the case. The whole card is clickable (the title link
-// stretches over it). Parts that are still [gaps] are left out.
+// purpose, with role badges and a "Read the case" link. The whole card is clickable (that link
+// stretches over the text panel, and the pictures have their own). Parts that are still [gaps]
+// are left out.
 // `compact` is the version in the card deck on the dark hero: a fixed-height card with just
 // the picture, and under it the logo, company, time, case title and "Read the case".
 import { Image } from 'astro:assets';
@@ -73,8 +74,8 @@ const wisp =
             <span class="eyebrow text-on-liquid">{item.note}</span>
           </div>
         )}
-        {/* The glass text area keeps the title link's click area to itself, so the pictures get
-            their own link (the title link is the one for keyboards and screen readers) */}
+        {/* The glass text area keeps the case link's click area to itself, so the pictures get
+            their own link ("Read the case" is the one for keyboards and screen readers) */}
         {item.href && <a href={item.href} class="absolute inset-0 z-40" tabindex="-1" aria-hidden="true" />}
       </div>
       <div class:list={['flex items-end justify-between gap-6 rounded-b-media border-t p-6', glass]}>
@@ -86,23 +87,19 @@ const wisp =
             {timeline && <span class="tabular-nums">{timeline}</span>}
           </p>
           <h3 class="text-32 leading-tight text-balance">
-            {item.href ? (
-              <a href={item.href} class="no-underline transition-colors duration-160 ease-out group-hover:text-case-accent-strong after:absolute after:inset-0 after:content-['']">
-                {item.title ?? item.client}
-              </a>
-            ) : (
-              (item.title ?? item.client)
-            )}
+            <span class="transition-colors duration-160 ease-out group-hover:text-case-accent-strong">{item.title ?? item.client}</span>
           </h3>
         </div>
         {item.href && (
-          <span
-            class="inline-flex shrink-0 items-center gap-2 rounded-pill bg-case-accent-strong px-4 py-2 text-14 font-medium text-on-accent transition-transform duration-160 ease-out group-hover:-translate-y-0.5"
-            aria-hidden="true"
+          // The case link: its click area stretches over the whole text panel (the glass is positioned)
+          <a
+            href={item.href}
+            aria-label={`Read the case: ${item.title ?? item.client}`}
+            class="inline-flex shrink-0 items-center gap-2 rounded-pill bg-case-accent-strong px-4 py-2 text-14 font-medium text-on-accent no-underline after:absolute after:inset-0 after:content-['']"
           >
             Read the case
-            <span class="transition-transform duration-160 ease-out group-hover:translate-x-1">→</span>
-          </span>
+            <span class="transition-transform duration-160 ease-out group-hover:translate-x-1" aria-hidden="true">→</span>
+          </a>
         )}
       </div>
     </article>
@@ -129,8 +126,8 @@ const wisp =
             <span class="eyebrow text-on-liquid">{item.note}</span>
           </div>
         )}
-        {/* The glass text area keeps the title link's click area to itself, so the pictures get
-            their own link (the title link is the one for keyboards and screen readers) */}
+        {/* The glass text area keeps the case link's click area to itself, so the pictures get
+            their own link ("Read the case" is the one for keyboards and screen readers) */}
         {item.href && <a href={item.href} class="absolute inset-0 z-40" tabindex="-1" aria-hidden="true" />}
       </div>
 
@@ -144,13 +141,7 @@ const wisp =
 
         <div>
           <h3 class="text-32 leading-tight text-balance">
-            {item.href ? (
-              <a href={item.href} class="no-underline transition-colors duration-160 ease-out group-hover:text-case-accent-strong after:absolute after:inset-0 after:content-['']">
-                {item.title ?? item.client}
-              </a>
-            ) : (
-              (item.title ?? item.client)
-            )}
+            <span class="transition-colors duration-160 ease-out group-hover:text-case-accent-strong">{item.title ?? item.client}</span>
           </h3>
           {purpose && <p class="mt-3 font-headline text-18 leading-snug font-medium text-text-muted text-balance">{purpose}</p>}
         </div>
@@ -159,10 +150,15 @@ const wisp =
         <div class="mt-auto flex flex-wrap items-center justify-between gap-4 pt-2">
           <RoleBadges roles={item.roles} />
           {item.href && (
-            <span class="inline-flex items-center gap-2 text-14 font-medium text-case-accent-strong" aria-hidden="true">
+            // The case link: its click area stretches over the whole text panel (the glass is positioned)
+            <a
+              href={item.href}
+              aria-label={`Read the case: ${item.title ?? item.client}`}
+              class="inline-flex items-center gap-2 text-14 font-medium text-case-accent-strong no-underline after:absolute after:inset-0 after:content-['']"
+            >
               Read the case
-              <span class="transition-transform duration-160 ease-out group-hover:translate-x-1">→</span>
-            </span>
+              <span class="transition-transform duration-160 ease-out group-hover:translate-x-1" aria-hidden="true">→</span>
+            </a>
           )}
         </div>
       </div>

@@ -10,6 +10,8 @@ const profile = (await getEntry('site', 'profile'))!.data;
 const cv = (await getEntry('site', 'cv'))!;
 const { Content } = await render(cv);
 const tel = profile.phone?.replace(/\s/g, '');
+// The "Download resume (PDF)" button is hidden for now; set to true to show it again
+const showDownload = false;
 ---
 
 <Base title="Resume – Malin Lilja, Senior UX & Product Designer" description={cv.data.description!} ogType="profile">
@@ -37,9 +39,13 @@ const tel = profile.phone?.replace(/\s/g, '');
           <li class="hidden print:list-item"><a href={Astro.site}>{Astro.site?.host}</a></li>
         </ul>
       </div>
-      <div class="print:hidden">
-        <LinkButton href="/malin-lilja-resume.pdf" download variant="solid">Download resume (PDF)</LinkButton>
-      </div>
+      {
+        showDownload && (
+          <div class="print:hidden">
+            <LinkButton href="/malin-lilja-resume.pdf" download variant="solid">Download resume (PDF)</LinkButton>
+          </div>
+        )
+      }
     </header>
 
     <div class="print:hidden"><StarDivider /></div>
