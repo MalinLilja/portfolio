@@ -106,17 +106,20 @@ export const hideBrackets = {
   heading(node, ctx) {
     if (!isTopLevel(node, ctx)) return;
     const siblings = ctx.parent(node).children;
-    // A heading whose whole section was gaps goes too.
+    // A heading whose whole section was gaps goes too. A heading with nothing under it
+    // (e.g. a degree line in the CV) stays.
+    let sectionIsEmpty = true;
     let sectionHasContent = false;
     for (let i = ctx.indexOf(node) + 1; i < siblings.length; i++) {
       const s = siblings[i];
       if (s.type === 'heading' && s.depth <= node.depth) break;
+      sectionIsEmpty = false;
       if (cleanBlock(s)) {
         sectionHasContent = true;
         break;
       }
     }
-    if (!sectionHasContent || !cleanBlock(node)) ctx.removeNode(node);
+    if (!(sectionIsEmpty || sectionHasContent) || !cleanBlock(node)) ctx.removeNode(node);
     else cleanTopLevel(node, ctx);
   },
   paragraph(node, ctx) {
