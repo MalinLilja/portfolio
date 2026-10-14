@@ -1,0 +1,10 @@
+// Cloudflare Worker that serves the built site (dist/) as static files. No server code.
+{
+  "name": "portfolio",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    // Unknown addresses get the site's own 404 page
+    "not_found_handling": "404-page"
+  }
+}
