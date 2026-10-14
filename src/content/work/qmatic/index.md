@@ -11,6 +11,10 @@ roles: [UX/UI designer, Agile team lead]
 # Big tile in the summary bento: why the project existed (draft by Claude, rewrite freely)
 purpose: "Build one cloud appointment platform that works for very different public and private sector clients."
 hero: ./staff-view.jpg
+cardBackground: ./card-background.webp
+cardImages:
+  - ./staff-view.jpg
+  - ./service-desk.jpg
 heroAlt: The start page of Qmatic Experience Cloud for staff, with a menu for booking, planning, check-in and serving, and help cards.
 tldr:
   company: Qmatic, a global provider of customer journey and queue management solutions

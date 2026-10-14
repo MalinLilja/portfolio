@@ -1,0 +1,59 @@
+---
+// The picture area of a case card: the liquid gradient (a still of the hero background) with
+// up to three of the case's pictures laid over it, a little tilted and overlapping. Slots
+// without a picture are empty frames. When the card is hovered (or focused) the pictures grow
+// a little. Must sit inside an element with `group`.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import gradient from '../assets/site/gradient.jpg';
+
+interface Props {
+  images: ImageMetadata[];
+  // Alt text for the first picture; the others are decorative
+  alt?: string;
+  eager?: boolean;
+  // Leave out the gradient, when the card already has it behind everything (CaseCard)
+  bare?: boolean;
+}
+
+const { images, alt = '', eager = false, bare = false } = Astro.props;
+
+// Left, right and a smaller one in front in the middle. Sized by the area's height (16:10,
+// capped in width on narrow cards) so they spread out on wide, short cards too. Rotation and
+// hover growth are separate properties (rotate, scale), so they combine.
+const slots = [
+  'left-[4%] top-[9%] h-[70%] max-w-[58%] -rotate-[5deg] z-10',
+  'right-[4%] top-[16%] h-[74%] max-w-[60%] rotate-[3.5deg] z-20',
+  'left-[33%] bottom-[5%] h-[46%] max-w-[40%] -rotate-[1.5deg] z-30',
+];
+---
+
+<div class:list={['relative size-full overflow-hidden', !bare && 'bg-liquid-mid']}>
+  {!bare && <Image src={gradient} alt="" widths={[640, 1080, 1600]} sizes="(min-width: 1080px) 1100px, 100vw" loading={eager ? 'eager' : 'lazy'} class="absolute inset-0 size-full! max-w-none! object-cover" />}
+  {
+    slots.map((slot, i) => {
+      const image = images[i];
+      return (
+        <div
+          class:list={[
+            'absolute aspect-16/10 overflow-hidden rounded-[10px] shadow-[0_18px_40px_-12px_color-mix(in_oklab,var(--color-bg)_70%,transparent)] transition-[scale] duration-500 ease-out group-hover:scale-[1.04] group-focus-within:scale-[1.04] motion-reduce:transition-none',
+            slot,
+            image ? 'bg-bg' : 'border-2 border-dashed border-on-liquid-muted/50 bg-surface/15 shadow-none',
+          ]}
+          style={`transition-delay: ${i * 40}ms`}
+        >
+          {image && (
+            <Image
+              src={image}
+              alt={i === 0 ? alt : ''}
+              widths={[480, 720, 1080]}
+              sizes="(min-width: 1080px) 600px, 60vw"
+              loading={eager && i === 0 ? 'eager' : 'lazy'}
+              class="size-full! max-w-none! object-cover object-left-top"
+            />
+          )}
+        </div>
+      );
+    })
+  }
+</div>

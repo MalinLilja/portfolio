@@ -11,6 +11,11 @@ roles: [Product designer, Product owner]
 # Big tile in the summary bento: why the project existed (draft by Claude, rewrite freely)
 purpose: "Turn an expert calculation method into an app that helps shipping teams order the most profitable speed."
 hero: ./planned-voyages.jpg
+cardBackground: ./card-background.webp
+cardImages:
+  - ./planned-voyages.jpg
+  - ./design-system.jpg
+  - ./service-blueprint.jpg
 heroAlt: SmartOpt's planned voyages view, a dark dashboard listing upcoming voyages with their optimal speed and fuel figures.
 tldr:
   company: Optimum Earnings, freight and shipping industry

@@ -29,6 +29,12 @@ const work = defineCollection({
       // Big tile in the summary bento: why the project existed
       purpose: z.string().optional(),
       hero: image(),
+      // Up to three pictures laid over the liquid background on the home page card (the first
+      // one gets heroAlt); spots without a picture show an empty frame. `cardImages: []` gives
+      // three empty frames. Left out, the card shows the hero picture.
+      cardImages: z.array(image()).max(3).optional(),
+      // The liquid background behind the home page card; without it, the shared gradient
+      cardBackground: image().optional(),
       // Small round company logo next to the client name on the home page card (square works best)
       logo: image().optional(),
       heroAlt: z.string(),

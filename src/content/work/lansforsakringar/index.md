@@ -11,6 +11,11 @@ roles: [UX/UI designer, Project manager, Product owner]
 # Big tile in the summary bento: why the project existed (draft by Claude, rewrite freely)
 purpose: "Streamline and align internal processes across teams with tailored digital services."
 hero: ./mina-sidor.jpg
+cardBackground: ./card-background.webp
+cardImages:
+  - ./mina-sidor.jpg
+  - ./processing-overview.jpg
+  - ./new-feature-dialog.jpg
 heroAlt: Personuppgiftskollen's "My pages" view, a table of personal data processing records with a message feed beside it.
 tldr:
   company: Länsförsäkringar Göteborg och Bohuslän, a regional insurance company

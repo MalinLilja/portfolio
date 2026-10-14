@@ -11,6 +11,11 @@ roles: [Product designer]
 # Big tile in the summary bento: why the project existed (draft by Claude, rewrite freely)
 purpose: "Get the residual value tool adopted by fitting it to the team's real valuation process."
 hero: ./screens-overview.webp
+cardBackground: ./card-background.webp
+cardImages:
+  - ./score-breakdown.jpg
+  - ./model-view.jpg
+  - ./project-board.jpg
 heroAlt: Four Ziklo RVE screens on a dark background - a car model's score breakdown with a 52% residual value suggestion, a project's model versions and reference models, a software score view, and the project board with columns for analysis, council and decision, and activation.
 tldr:
   company: Ziklo, The Mobility Bank, a car financing and leasing bank

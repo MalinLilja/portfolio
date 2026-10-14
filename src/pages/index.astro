@@ -46,6 +46,8 @@ const work = [
     href: `/work/${c.id}`,
     accent: c.data.accent,
     image: c.data.hero,
+    images: c.data.cardImages ?? [c.data.hero],
+    background: c.data.cardBackground,
     imageAlt: c.data.heroAlt,
     logo: c.data.logo,
   })),
