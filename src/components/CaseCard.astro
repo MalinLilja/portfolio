@@ -1,7 +1,6 @@
 ---
 // One case as a card: the case pictures over the liquid background (CaseCollage), then company and timeline, the case title, its
-// purpose, and three short parts (challenge, what I did, result) from the case's summary,
-// with role badges and a link to the case. The whole card is clickable (the title link
+// purpose, with role badges and a link to the case. The whole card is clickable (the title link
 // stretches over it). Parts that are still [gaps] are left out.
 // `compact` is the version in the card deck on the dark hero: a fixed-height card with just
 // the picture, and under it the logo, company, time, case title and "Read the case".
@@ -17,9 +16,6 @@ export interface CaseItem {
   title?: string;
   purpose?: string;
   timeline?: string;
-  problem?: string;
-  whatIDid?: string;
-  result?: string;
   roles: string[];
   href?: string;
   note?: string;
@@ -40,11 +36,6 @@ interface Props {
 }
 
 const { item, eager = false, compact = false } = Astro.props;
-const parts = [
-  { label: 'Challenge', text: hideGaps(item.problem) },
-  { label: 'What I did', text: hideGaps(item.whatIDid) },
-  { label: 'Result', text: hideGaps(item.result) },
-].filter((part) => part.text);
 const timeline = hideGaps(item.timeline);
 const purpose = hideGaps(item.purpose);
 // On hover (and keyboard focus) the border takes the case colour and the card glows in it
@@ -164,16 +155,6 @@ const wisp =
           {purpose && <p class="mt-3 font-headline text-18 leading-snug font-medium text-text-muted text-balance">{purpose}</p>}
         </div>
 
-        {parts.length > 0 && (
-          <dl class="grid gap-4 border-t border-border pt-5">
-            {parts.map((part) => (
-              <div class="grid gap-1 sm:grid-cols-[8rem_1fr] sm:gap-4">
-                <dt class="eyebrow text-14">{part.label}</dt>
-                <dd class="text-16 leading-snug">{part.text}</dd>
-              </div>
-            ))}
-          </dl>
-        )}
 
         <div class="mt-auto flex flex-wrap items-center justify-between gap-4 pt-2">
           <RoleBadges roles={item.roles} />

@@ -8,11 +8,19 @@
 // (z-10) and the star transition (z-20) can go between them (see index.astro).
 // The mouse stirs it (a small fluid simulation). It pauses when it's off screen, the tab is
 // hidden, or the star transition has covered it, so it costs nothing while it can't be seen.
+// Case pages use it too: their [data-case] block in tokens.css swaps in the case's colours.
+
+interface Props {
+  // Id of the heading that names the section
+  labelledby?: string;
+}
+
+const { labelledby = 'positioning' } = Astro.props;
 ---
 
 <section
   class="liquid-hero relative flex [--hero-fade:clamp(180px,30vh,320px)] min-h-[calc(100svh-var(--header-height))] flex-col justify-end text-on-liquid"
-  aria-labelledby="positioning"
+  aria-labelledby={labelledby}
 >
   <div
     class="absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_bottom,black_calc(100%-var(--hero-fade)),transparent)] bg-liquid-mid bg-[linear-gradient(140deg,var(--color-liquid-deep),var(--color-liquid-light)_55%,var(--color-liquid-mid))]"

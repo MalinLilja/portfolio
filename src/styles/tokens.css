@@ -84,6 +84,8 @@
   /* The giant positioning line in the home page hero. Sized so the longest option of the
      clickable phrase still fits on a laptop screen. */
   --text-hero: clamp(2.5rem, 6.5vw, 6.5rem);
+  /* The client name in a case page's liquid header: as big as the hero, smaller for long names */
+  --text-hero-long: clamp(2.25rem, 5.2vw, 5.25rem);
   /* Unbounded headings, names and card titles (small 14px labels stay semibold) */
   --font-weight-heading: 400;
   /* Malin's name: gradient card, Resume page, header */
@@ -140,25 +142,61 @@
 [data-case="smartopt"] {
   --color-case-accent: #4ee0b0;
   --color-case-accent-strong: #4ee0b0;
+  /* The case page's liquid header (preset from explorations/liquid-landing.html) */
+  --color-liquid-deep: #172231;
+  --color-liquid-mid: #2c6e64;
+  --color-liquid-light: #4ee0b0;
+  --color-liquid-shine: #e6fff6;
+  --color-on-liquid: #fffdfa;
+  --color-on-liquid-muted: rgb(255 253 250 / 0.84);
 }
 
 [data-case="ziklo"] {
   --color-case-accent: #7fd88a;
   --color-case-accent-strong: #7fd88a;
+  /* The case page's liquid header (preset from explorations/liquid-landing.html) */
+  --color-liquid-deep: #14232a;
+  --color-liquid-mid: #2b4a50;
+  --color-liquid-light: #7fd88a;
+  --color-liquid-shine: #d8f5d4;
+  --color-on-liquid: #fffdfa;
+  --color-on-liquid-muted: rgb(255 253 250 / 0.84);
 }
 
 [data-case="qmatic"] {
   --color-case-accent: #5ac21e;
   --color-case-accent-strong: #5ac21e;
+  /* The case page's liquid header (preset from explorations/liquid-landing.html) */
+  --color-liquid-deep: #4bbf14;
+  --color-liquid-mid: #a8d3ee;
+  --color-liquid-light: #eef5f9;
+  --color-liquid-shine: #ffffff;
+  --color-on-liquid: #150f2e;
+  --color-on-liquid-muted: rgb(21 15 46 / 0.8);
 }
 
-/* ILP's own brand is black and white, so the case uses the site's light liquid violet */
+/* ILP's own brand is black and white, so the case uses the site's light liquid violet
+   (the same value as the home hero's --color-liquid-mid, which ILP overrides below) */
 [data-case="ilp"] {
-  --color-case-accent: var(--color-liquid-mid);
-  --color-case-accent-strong: var(--color-liquid-mid);
+  --color-case-accent: #b8b8ff;
+  --color-case-accent-strong: #b8b8ff;
+  /* The case page's liquid header (preset from explorations/liquid-landing.html) */
+  --color-liquid-deep: #121214;
+  --color-liquid-mid: #7c0f2c;
+  --color-liquid-light: #e2246a;
+  --color-liquid-shine: #34c3e6;
+  --color-on-liquid: #fffdfa;
+  --color-on-liquid-muted: rgb(255 253 250 / 0.84);
 }
 
 [data-case="lansforsakringar"] {
   --color-case-accent: #4f9fe6;
   --color-case-accent-strong: #4f9fe6;
+  /* The case page's liquid header (preset from explorations/liquid-landing.html) */
+  --color-liquid-deep: #0a3b7c;
+  --color-liquid-mid: #5fa8e8;
+  --color-liquid-light: #eaf4fb;
+  --color-liquid-shine: #ffffff;
+  --color-on-liquid: #150f2e;
+  --color-on-liquid-muted: rgb(21 15 46 / 0.8);
 }

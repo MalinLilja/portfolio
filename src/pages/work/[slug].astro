@@ -5,6 +5,7 @@ import CaseBento from '../../components/CaseBento.astro';
 import ProcessStepper from '../../components/ProcessStepper.astro';
 import LinkButton from '../../components/LinkButton.astro';
 import ImageZoom from '../../components/ImageZoom.astro';
+import LiquidHero from '../../components/LiquidHero.astro';
 import { hideGaps } from '../../lib/brackets';
 
 export async function getStaticPaths() {
@@ -19,6 +20,7 @@ const { entry, next } = Astro.props;
 const { data } = entry;
 const { Content } = await render(entry);
 const links = data.links.filter((l) => l.url);
+const timeline = hideGaps(data.tldr.timeline);
 ---
 
 <Base
@@ -30,18 +32,26 @@ const links = data.links.filter((l) => l.url);
   accent={data.accent}
 >
   <article>
-    <header class="container-page pt-8">
-      <a class="inline-flex gap-2 py-2 font-medium text-text-muted no-underline hover:text-text" href="/#work"
+    {/* Liquid header in the case's own colours (tokens.css → [data-case]): the client name
+        big, then the case title */}
+    <LiquidHero labelledby="case-title">
+      <a class="inline-flex gap-2 py-2 font-medium text-on-liquid-muted no-underline hover:text-on-liquid" href="/#work"
         ><span aria-hidden="true">←</span> All work</a
       >
-      <p class="eyebrow mt-8 text-case-accent-strong">{data.client}</p>
-      <h1 class="mt-3 max-w-[24ch] font-headline text-48 font-medium tracking-normal">{data.title}</h1>
-      <ul class="mt-6 flex flex-wrap gap-2" aria-label="Tags">
-        {data.tags.map((t) => <li class="rounded-pill border border-border px-3 py-1 text-14 leading-[1.4]">{t}</li>)}
-      </ul>
-    </header>
+      <p class="eyebrow mt-8 text-on-liquid-muted">{data.client}{timeline && ` · ${timeline}`}</p>
+      <p
+        class:list={[
+          'mt-4 font-display leading-[0.95] font-name break-words uppercase',
+          data.client.length > 10 ? 'text-hero-long' : 'text-hero',
+        ]}
+        aria-hidden="true"
+      >
+        {data.client}
+      </p>
+      <h1 id="case-title" class="mt-[clamp(32px,6vh,72px)] max-w-[24ch] font-display text-32 leading-[1.15] font-heading text-balance md:text-48">{data.title}</h1>
+    </LiquidHero>
 
-    <div class="container-page mt-12 grid gap-8">
+    <div class="container-page grid gap-8">
       <CaseBento hero={data.hero} heroAlt={data.heroAlt} roles={data.roles ?? []} purpose={data.purpose} tldr={data.tldr} />
       {data.process && <ProcessStepper steps={data.process} />}
       {

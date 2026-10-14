@@ -22,31 +22,32 @@ interface Props {
 
 const { images, alt = '', eager = false, bare = false, spill } = Astro.props;
 
-// Left, right and a smaller one in front in the middle. Sized by the area's height (16:10,
-// capped in width on narrow cards) so they spread out on wide, short cards too. Rotation and
+// Left, right and a smaller one in front in the middle. Each is 16:10, as wide as the area's
+// width or height allows (cqw/cqh: the area is a size container), so they keep their shape on
+// wide, short cards and on narrow phone cards alike. Rotation and
 // hover growth are separate properties (rotate, scale), so they combine. The small one always
 // stays inside, so it never covers the card's title.
 const contained = [
-  'left-[4%] top-[9%] h-[70%] max-w-[58%]',
-  'right-[4%] top-[16%] h-[74%] max-w-[60%]',
-  'left-[33%] bottom-[5%] h-[46%] max-w-[40%]',
+  'left-[4%] top-[9%] w-[min(58cqw,112cqh)]',
+  'right-[4%] top-[16%] w-[min(60cqw,118cqh)]',
+  'left-[33%] bottom-[5%] w-[min(40cqw,74cqh)]',
 ];
 const spilling = [
-  'left-[3%] -top-[12%] h-[84%] max-w-[58%]',
-  'right-[3%] -top-[5%] h-[90%] max-w-[62%]',
-  'left-[31%] bottom-[6%] h-[44%] max-w-[38%]',
+  'left-[3%] -top-[12%] w-[min(58cqw,134cqh)]',
+  'right-[3%] -top-[5%] w-[min(62cqw,144cqh)]',
+  'left-[31%] bottom-[6%] w-[min(38cqw,70cqh)]',
 ];
 const spillingBelowLg = [
-  'left-[3%] -top-[12%] h-[84%] max-w-[58%] lg:top-[9%] lg:h-[70%]',
-  'right-[3%] -top-[5%] h-[90%] max-w-[62%] lg:top-[16%] lg:h-[74%]',
-  'left-[31%] bottom-[6%] h-[44%] max-w-[38%] lg:bottom-[5%] lg:h-[46%]',
+  'left-[3%] -top-[12%] w-[min(58cqw,134cqh)] lg:top-[9%] lg:w-[min(58cqw,112cqh)]',
+  'right-[3%] -top-[5%] w-[min(62cqw,144cqh)] lg:top-[16%] lg:w-[min(60cqw,118cqh)]',
+  'left-[31%] bottom-[6%] w-[min(38cqw,70cqh)] lg:bottom-[5%] lg:w-[min(40cqw,74cqh)]',
 ];
 const place = spill === 'always' ? spilling : spill === 'stacked' ? spillingBelowLg : contained;
 const tilt = ['-rotate-[5deg] z-10', 'rotate-[2deg] z-20', '-rotate-[1.5deg] z-30'];
 const slots = place.map((p, i) => `${p} ${tilt[i]}`);
 ---
 
-<div class:list={['relative size-full', !spill && 'overflow-hidden', !bare && 'bg-liquid-mid']}>
+<div class:list={['relative size-full [container-type:size]', !spill && 'overflow-hidden', !bare && 'bg-liquid-mid']}>
   {!bare && <Image src={gradient} alt="" widths={[640, 1080, 1600]} sizes="(min-width: 1080px) 1100px, 100vw" loading={eager ? 'eager' : 'lazy'} class="absolute inset-0 size-full! max-w-none! object-cover" />}
   {
     slots.map((slot, i) => {
