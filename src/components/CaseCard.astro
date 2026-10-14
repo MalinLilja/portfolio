@@ -49,7 +49,8 @@ const purpose = hideGaps(item.purpose);
     'group relative grid overflow-hidden rounded-media border bg-surface',
     compact ? 'h-full grid-cols-[minmax(0,58fr)_minmax(0,42fr)]' : 'lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]',
     item.href
-      ? 'border-border transition-colors duration-160 ease-out hover:border-case-accent focus-within:border-case-accent'
+      ? // On hover (and keyboard focus) the border takes the case colour and the card glows in it
+        'border-border transition-[border-color,box-shadow] duration-300 ease-out hover:border-case-accent hover:shadow-[0_0_56px_-10px_color-mix(in_oklab,var(--color-case-accent-strong)_70%,transparent)] focus-within:border-case-accent focus-within:shadow-[0_0_56px_-10px_color-mix(in_oklab,var(--color-case-accent-strong)_70%,transparent)]'
       : 'border-dashed border-stars',
   ]}
 >

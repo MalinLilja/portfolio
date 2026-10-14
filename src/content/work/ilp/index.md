@@ -1,12 +1,12 @@
 ---
 # Built only from the slides ILP approved in writing (ILP case.pptx, October 2026).
 # Don't add anything about ILP beyond what those slides show.
-title: One planning platform for a 200-person VFX studio
+title: Planning platform for VFX
 client: ILP VFX
 order: 0
 accent: ilp
 # draft by Claude, rewrite freely
-summary: One planning platform for a 200-person VFX studio, from research to live product.
+summary: Planning platform for VFX, from research to live product.
 # draft by Claude, rewrite freely
 description: How Malin Lilja designed a planning platform that brings crewing and bidding together at ILP VFX, replacing a legacy system and disconnected spreadsheets.
 tags: [Product design, UX design]
