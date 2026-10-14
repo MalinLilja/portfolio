@@ -5,9 +5,7 @@ title: Planning platform for VFX
 client: ILP VFX
 order: 0
 accent: ilp
-# draft by Claude, rewrite freely
 summary: Planning platform for VFX, from research to live product.
-# draft by Claude, rewrite freely
 description: How Malin Lilja designed a planning platform that brings crewing and bidding together at ILP VFX, replacing a legacy system and disconnected spreadsheets.
 tags: [Product design, UX design]
 # Badges on the home page card: your role on the project
@@ -42,17 +40,20 @@ links: []
 
 A VFX studio sells its work through bids, then staffs each show with artists over months to deliver it. Simply put, if you make the right bid and deliver on it, you're profitable. At ILP, these steps lived in a legacy system that had become one solution for everything: time off, who was on each show, decisions on key personnel, finances, and even the assignment of workstations.
 
-Executive producers, crewing managers, talent managers and producers each kept their own picture of the plan. They needed one source of truth. But without workarounds and several separate sheets, it was impossible to trace what had happened, what had changed, and which scenarios were possible. It relied on specific people knowing how to handle it. If one specific person took unplanned leave or, God forbid, went on long-term sick leave, salaries couldn't be paid out correctly.
+Executive producers, crewing managers, talent managers and producers each kept their own picture of the plan. They needed one source of truth. But without workarounds and several separate sheets, it was impossible to trace what had happened, what had changed, and which scenarios were possible. It relied on specific people knowing how to handle it. If one specific person took unplanned leave for longer than a few weeks, salaries couldn't be paid out correctly.
 
-Replacing it all in one go was impossible, as it held all the information. The crewing manager spent days of their time correcting this information. The system had worked when the studio was 10 people, but now the studio has 200+ people, plus sister studios and subsidiaries.
+Replacing it all in one go was impossible, as it held all the information. The crewing manager spent days of their time correcting this information. Although the system had worked when the studio was 10 people, over time it grew to 200+ people, plus sister studios and subsidiaries which led to a need for an updated system that could manage a larger company.
 
-The goal was to design a tool that people would actually use to connect the dots when planning and to keep everyone on the same page. One guide and source of truth when asking "What's going on?"
+The goal was to design a tool that people would actually use to connect the dots when planning and would keep everyone on the same page. One guide and source of truth when asking "What's going on?"
 
 ## Research
 
 I collected the user research in a living "service blueprint" to help product management and the team understand the relationships and which priorities to set.
 
 ![Two service blueprints: an early one with the planning process in swimlanes, and a fuller one with phases from day-to-day operations through bidding, assignments and the production plan.](./service-blueprint.webp "The living service blueprint")
+
+## Process
+We started out an iterative process, chucking the big system into pieces we could ship and collaboratively validate with the users. I shared concepts with the team through live, and asyncronous, design feedback sessions, setting alignmet on what to build and why. Getting backend, frontend and product management to align on a scope and design. 
 
 ## Result
 
