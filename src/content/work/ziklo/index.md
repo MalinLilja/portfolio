@@ -8,7 +8,7 @@ description: How Malin Lilja redesigned Ziklo's residual value tool around the t
 tags: [Product design, User research, User adoption, via Amply]
 # Badges on the home page card: your role on the project
 roles: [Product designer]
-# Big tile in the summary bento: why the project existed (draft by Claude, rewrite freely)
+# Big tile in the summary bento: why the project existed
 purpose: "Get the residual value tool adopted by fitting it to the team's real valuation process."
 hero: ./screens-overview.webp
 cardBackground: ./card-background.webp
@@ -25,14 +25,14 @@ tldr:
   # Stakeholders tile in the summary bento: one per line, e.g. - Residual value analysts
   stakeholders: [Residual value analysts, Credit council, Product manager]
   whatIDid: Mapped the real valuation process with users, adapted the existing tool to it within the technical constraints, and supported the rollout.
-  result: "[Add adoption, e.g. the team now runs its valuation process in the tool.]"
+  result: The team now runs its valuation process in the tool and Ziklo is now taking the application in-house, the users are embracing it!
 ---
 
 ## The problem
 
 A car's residual value is what it's expected to be worth at the end of a lease. Getting it right matters for a financing bank.
 
-Ziklo RVE is a tool that helps with keeping correct and updated residual values for Ziklo. It's partly a system to support the process of analyzing and deciding on residual values, but it also helps to suggest new residual values by giving an automatic score to the cars.
+Ziklo RVE is a tool that helps with keeping correct and updated residual values for Ziklo. This tool analyzes and determines existing residual values while also suggesting new residual values by giving an automatic score to the cars analyzed.
 
 ![A car model's score breakdown: a 52% residual value suggestion and a waterfall chart of the factors behind the total score.](./score-breakdown.jpg "Each car model gets an automatic score and a suggested residual value")
 
