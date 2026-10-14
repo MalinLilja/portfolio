@@ -69,10 +69,8 @@ const work = [
     <LiquidHero>
       {/* Fades out as the star covers the hero (--wipe-text, 0 → 1) */}
       <p class="eyebrow text-on-liquid-muted opacity-[calc(1-var(--wipe-text,0))]">{profile.title} · {profile.city}</p>
-      <p class="mt-5 font-display text-hero leading-[0.92] font-name uppercase opacity-[calc(1-var(--wipe-text,0))]">
-        {profile.name.split(' ').map((part) => <span class="block">{part}</span>)}
-      </p>
-      <h1 id="positioning" class="mt-[clamp(28px,5vh,56px)] max-w-[32ch] font-headline text-32 leading-[1.15] font-medium tracking-normal opacity-[calc(1-var(--wipe-text,0))]">
+      {/* The positioning line is the main thing, in the big display style */}
+      <h1 id="positioning" class="mt-5 max-w-[9ch] font-display text-hero leading-[1.08] font-name uppercase opacity-[calc(1-var(--wipe-text,0))]">
         <PositioningLine text={home.data.positioning!} phrase={home.data.positioningCycle?.phrase} options={home.data.positioningCycle?.options} />
       </h1>
       {/* Room for the photo on phones, where it sits under the text */}

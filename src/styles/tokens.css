@@ -81,8 +81,9 @@
   --text-32: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
   --text-48: clamp(2rem, 1.4rem + 2.4vw, 3rem);
   --text-72: clamp(2.5rem, 1.6rem + 3.6vw, 4.5rem);
-  /* The giant name in the home page hero */
-  --text-hero: clamp(3rem, 11vw, 10.5rem);
+  /* The giant positioning line in the home page hero. Sized so the longest option of the
+     clickable phrase still fits on a laptop screen. */
+  --text-hero: clamp(2.5rem, 6.5vw, 6.5rem);
   /* Unbounded headings, names and card titles (small 14px labels stay semibold) */
   --font-weight-heading: 400;
   /* Malin's name: gradient card, Resume page, header */
