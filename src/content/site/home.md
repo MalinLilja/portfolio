@@ -26,6 +26,28 @@ experience:
   - role: Master's thesis
     org: InUse
     years: "2019"
+# Companies I've worked with or for, in the scrolling strip above the projects.
+# Logos are white on transparent, in src/content/site/logos/. logoOnly: true hides the name
+# when the logo already spells it out.
+companies:
+  - name: ILP VFX
+    logo: ./logos/ilp.png
+  - name: Amply
+    logo: ./logos/amply.png
+  - name: Qmatic
+    logo: ./logos/qmatic.png
+    logoOnly: true
+  - name: Ziklo
+    logo: ./logos/ziklo.png
+    logoOnly: true
+  - name: SmartOpt
+    logo: ./logos/smartopt.png
+    logoOnly: true
+  - name: Länsförsäkringar Göteborg och Bohuslän
+    logo: ./logos/lansforsakringar.png
+    logoOnly: true
+    logoHeight: 40
+  - name: InUse
 # Cases that can't be shown yet. Shown first, as a card that doesn't link anywhere.
 # Example:
 #   - client: Company name

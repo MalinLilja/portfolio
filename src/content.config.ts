@@ -80,6 +80,18 @@ const site = defineCollection({
       )
       .optional(),
     testimonials: z.array(z.object({ text: z.string(), name: z.string(), title: z.string() })).default([]),
+    // Home page: companies Malin has worked with or for, in a scrolling strip. Logos are white
+    // on transparent. Without a logo, the name is shown on its own; with a logo that is just a
+    // mark (no name in it), the name is shown next to it unless logoOnly is true.
+    companies: z
+      .array(z.object({
+          name: z.string(),
+          logo: image().optional(),
+          logoOnly: z.boolean().default(false),
+          // Logo height in px, for logos that need more room (e.g. two lines of text)
+          logoHeight: z.number().optional(),
+        }))
+      .default([]),
     beyondWork: z.string().optional(),
     practice: z
       .object({

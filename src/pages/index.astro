@@ -7,6 +7,7 @@ import HeroStarWipe from '../components/HeroStarWipe.astro';
 import PositioningLine from '../components/PositioningLine.astro';
 import CaseCards from '../components/CaseCards.astro';
 import CaseDeck from '../components/CaseDeck.astro';
+import CompanyStrip from '../components/CompanyStrip.astro';
 import Practice from '../components/Practice.astro';
 import ConnectTheDots from '../components/ConnectTheDots.astro';
 import ExperienceStrip from '../components/ExperienceStrip.astro';
@@ -58,11 +59,12 @@ const work = [
 >
   <!-- Hero stage: with JavaScript and motion allowed, a little scroll makes a star from the
        corner grow until the hero is dark, while the hero stays pinned briefly (see HeroStarWipe).
-       The hero text fades out and the intro's first paragraph fades in on the dark screen.
-       On wide screens the dark screen also shows the case card deck (CaseDeck).
+       The hero text fades out and the dark screen shows the intro's first paragraph on its own,
+       one sentence at a time as you scroll. Scrolling on, the intro moves away (--lead-exit,
+       0 → 1) and, on wide screens, the case card deck (CaseDeck) comes in.
        The photo overlaps the hero's bottom edge, so it sits outside the hero's clipping. -->
   <div
-    class="relative overflow-x-clip js:motion-safe:h-[calc(100svh-var(--header-height)+var(--wipe-travel))] [--wipe-travel:30svh]"
+    class="relative overflow-x-clip js:motion-safe:h-[calc(100svh-var(--header-height)+var(--wipe-travel)+var(--lead-travel))] [--wipe-travel:30svh] [--lead-travel:65svh] lg:[--lead-travel:115svh]"
     data-hero-stage
   >
     <div class="relative js:motion-safe:sticky js:motion-safe:top-(--header-height)">
@@ -78,17 +80,28 @@ const work = [
     </LiquidHero>
     {home.data.photo && <HeroPhoto src={home.data.photo} alt={home.data.photoAlt ?? ''} />}
     <HeroStarWipe />
-    {/* The intro's first paragraph, shown on the dark hero once the star has covered it
-        (--wipe-intro, 0 → 1). Only in the animated version; otherwise it stays in the intro below. */}
-    <div class="pointer-events-none absolute inset-0 z-30 hidden items-center opacity-(--wipe-intro,0) js:motion-safe:flex [&.is-shown]:pointer-events-auto" data-hero-lead>
+    {/* The intro's first paragraph as its own screen, centred, once the star has covered the
+        hero (--wipe-intro, 0 → 1); it moves up and away as the cases come in (--lead-exit).
+        Only in the animated version; otherwise it stays in the intro below. */}
+    <div
+      class="pointer-events-none absolute inset-0 z-30 hidden translate-y-[calc(var(--lead-exit,0)*-8svh)] items-center opacity-[calc(var(--wipe-intro,0)*(1-var(--lead-exit,0)))] js:motion-safe:flex"
+      data-hero-lead
+    >
       <div class="container-page">
         {/* The first sentence leads in white; the rest are light and muted */}
-        <div class="grid max-w-[60ch] gap-4 font-headline text-18 leading-snug font-light text-text-muted md:max-w-[44%] lg:max-w-[20rem] [&>p:first-child]:font-medium [&>p:first-child]:text-text">
-          {leadSentences.map((sentence) => <p>{sentence}</p>)}
+        <div class="mx-auto grid max-w-[30rem] gap-5 font-headline text-18 leading-snug font-light text-text-muted [&>p:first-child]:text-22 [&>p:first-child]:font-medium [&>p:first-child]:text-text">
+          {/* One sentence at a time as you scroll (script below); the first comes with the dark screen */}
+          {leadSentences.map((sentence) => (
+            <p class="translate-y-3 opacity-0 transition-[opacity,translate] duration-500 ease-out [&.is-revealed]:translate-y-0 [&.is-revealed]:opacity-100" data-lead-line>
+              {sentence}
+            </p>
+          ))}
         </div>
       </div>
     </div>
-    <CaseDeck items={work} />
+    <CaseDeck items={work}>
+      <CompanyStrip slot="above" items={home.data.companies} id="deck-companies" class="w-full" />
+    </CaseDeck>
     </div>
   </div>
 
@@ -100,6 +113,8 @@ const work = [
       <h2 id="work-heading" class="sr-only">Selected work</h2>
       {/* On wide screens with motion the cases are the deck on the dark hero instead */}
       <div class="lg:js:motion-safe:hidden">
+        {/* Companies I've worked with, above the cases (on wide screens it sits above the deck) */}
+        <CompanyStrip items={home.data.companies} class="-mx-(--gutter) mb-10 md:mb-14" />
         <CaseCards items={work} />
       </div>
     </section>
@@ -140,3 +155,38 @@ const work = [
 
   </div>
 </Base>
+
+<script>
+  // The intro on the dark hero: after the star has covered the hero, each further stretch of
+  // scrolling reveals the next sentence (scrolling back up hides them again). Then the intro
+  // moves away and the card deck comes in (--lead-exit on the stage, 0 → 1, also sent as the
+  // `hero-lead` event). Once the deck is fully in, the stage gets data-lead-done and the deck
+  // takes over the mouse wheel. The hero stage stays pinned for all this (--lead-travel).
+  const stage = document.querySelector<HTMLElement>('[data-hero-stage]');
+  const lines = [...document.querySelectorAll<HTMLElement>('[data-lead-line]')];
+  if (stage && lines.length) {
+    // In screen heights scrolled from the top of the stage
+    const START = 0.15; // the second sentence
+    const STEP = 0.2; // each further sentence
+    const EXIT_FROM = START + STEP * (lines.length - 1) + 0.2; // the intro starts moving away
+    const EXIT_LENGTH = 0.2;
+    let wipe = (window as unknown as { heroWipe?: number }).heroWipe ?? 0;
+    const update = () => {
+      const scrolled = -stage.getBoundingClientRect().top;
+      const shown = wipe < 0.5 ? 0 : 1 + Math.max(0, Math.floor((scrolled - START * innerHeight) / (STEP * innerHeight) + 1));
+      lines.forEach((line, i) => line.classList.toggle('is-revealed', i < shown));
+      const exit = wipe < 0.5 ? 0 : Math.min(1, Math.max(0, (scrolled / innerHeight - EXIT_FROM) / EXIT_LENGTH));
+      stage.style.setProperty('--lead-exit', exit.toFixed(3));
+      stage.toggleAttribute('data-lead-done', exit >= 1);
+      (window as unknown as { heroLeadExit?: number }).heroLeadExit = exit;
+      window.dispatchEvent(new CustomEvent('hero-lead', { detail: exit }));
+    };
+    window.addEventListener('hero-wipe', (e) => {
+      wipe = (e as CustomEvent<number>).detail;
+      update();
+    });
+    addEventListener('scroll', update, { passive: true });
+    addEventListener('resize', update);
+    update();
+  }
+</script>

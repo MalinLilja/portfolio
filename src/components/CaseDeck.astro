@@ -21,7 +21,7 @@ const control =
 ---
 
 <div
-  class="case-deck pointer-events-none absolute inset-0 z-30 hidden overflow-hidden opacity-(--wipe-intro,0) lg:js:motion-safe:block"
+  class="case-deck pointer-events-none absolute inset-0 z-30 hidden translate-y-[calc((1-var(--lead-exit,0))*6svh)] overflow-hidden opacity-(--lead-exit,0) lg:js:motion-safe:block [--deck-h:58svh] [--deck-w:min(1100px,72vw)] [--strip-h:2.75rem] [--strip-gap:3rem] [--deck-top:calc((100%-var(--strip-h)-var(--strip-gap)-var(--deck-h)-4.5rem)/2+var(--strip-h)+var(--strip-gap))]"
   role="region"
   aria-label="Selected work"
 >
@@ -36,8 +36,13 @@ const control =
     }
   </svg>
 
-  {/* The front card, centred vertically with room for the controls below it */}
-  <ol class="deck-frame absolute top-[calc((100%-64svh-4.5rem)/2)] right-[calc(var(--gutter)+2.5rem)] h-[64svh] w-[min(1100px,56vw)] [perspective:1600px]">
+  {/* Above the cards: the company strip (slot "above"), full width */}
+  <div class="pointer-events-auto absolute inset-x-0 top-[calc(var(--deck-top)-var(--strip-gap)-var(--strip-h))] flex h-(--strip-h) items-center">
+    <slot name="above" />
+  </div>
+
+  {/* The front card, centred, under the strip, with room for the controls below it */}
+  <ol class="deck-frame absolute top-(--deck-top) left-[calc((100%-var(--deck-w))/2)] h-(--deck-h) w-(--deck-w) [perspective:1600px]">
     {
       items.map((item, i) => (
         <li class="deck-card absolute inset-0 origin-top-left will-change-transform" data-deck-card data-client={item.client} inert>
@@ -54,7 +59,7 @@ const control =
   </ol>
 
   <div
-    class="pointer-events-auto absolute top-[calc((100%-64svh-4.5rem)/2+64svh+1.5rem)] right-[calc(var(--gutter)+2.5rem)] z-[200] flex w-[min(1100px,56vw)] items-center justify-between gap-4"
+    class="pointer-events-auto absolute top-[calc(var(--deck-top)+var(--deck-h)+1.5rem)] left-[calc((100%-var(--deck-w))/2)] z-[200] flex w-(--deck-w) items-center justify-between gap-4"
   >
     <button type="button" class:list={['deck-prev grid size-11 place-items-center text-18', control]} aria-label="Previous case">
       <span aria-hidden="true">←</span>
@@ -172,6 +177,8 @@ const control =
       (e) => {
         if (e.ctrlKey || !active() || parseFloat(getComputedStyle(deck).opacity) < 0.5) return;
         if (!overCards(e.clientX, e.clientY)) return;
+        // While the intro is still revealing sentence by sentence, the wheel scrolls the page
+        if (!stage.hasAttribute('data-lead-done')) return;
         const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
         const now = performance.now();
         if (now < lockedUntil) {
@@ -200,18 +207,21 @@ const control =
       a.addEventListener('click', (e) => {
         if (!active() || location.pathname !== '/') return;
         e.preventDefault();
-        window.scrollTo({ top: window.scrollY + stage.getBoundingClientRect().top + innerHeight * 0.3, behavior: 'smooth' });
+        // To the end of the pinned stretch, where the whole intro is shown
+        const end = window.scrollY + stage.getBoundingClientRect().top + stage.offsetHeight - innerHeight;
+        window.scrollTo({ top: end, behavior: 'smooth' });
       }),
     );
     addEventListener('resize', () => render(false));
 
-    // Until the hero has turned dark the deck is invisible, and it must not catch clicks or
-    // keyboard focus either (the front card would otherwise sit over the hero photo)
-    const setVisible = (wipe: number) => {
-      deck.style.visibility = wipe >= 0.5 ? 'visible' : 'hidden';
+    // Until the intro has been scrolled past (index.astro sends `hero-lead`, 0 → 1) the deck is
+    // invisible, and it must not catch clicks or keyboard focus either (the front card would
+    // otherwise sit over the hero photo and the intro)
+    const setVisible = (exit: number) => {
+      deck.style.visibility = exit >= 0.5 ? 'visible' : 'hidden';
     };
-    setVisible((window as unknown as { heroWipe?: number }).heroWipe ?? 0);
-    window.addEventListener('hero-wipe', (e) => setVisible((e as CustomEvent<number>).detail));
+    setVisible((window as unknown as { heroLeadExit?: number }).heroLeadExit ?? 0);
+    window.addEventListener('hero-lead', (e) => setVisible((e as CustomEvent<number>).detail));
     go(0);
     render(false);
   }
