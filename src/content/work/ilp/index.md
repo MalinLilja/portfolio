@@ -32,9 +32,12 @@ tldr:
   # problem, whatIDid and result: drafts by Claude from the slides, rewrite freely
   # DRAFTS by Claude from the case text (brief, insight, designIntent): rewrite freely
   brief: "A new planning platform for a 200+ person VFX studio, taken from the first research to a live product."
-  problem: Bidding and crewing lived in a legacy system and separate spreadsheets, so no one could see what had changed or which scenarios were possible.
-  insight: "The bidding itself wasn't the problem; keeping everyone in sync was. Each role kept its own picture of the plan, so the platform had to become the one place to answer \"What's going on?\""
-  designIntent: "Break the big system into modules we could ship and validate with users one at a time: people and skills, bid import, then drafting and assigning key artists. A living service blueprint and a shadcn-based design system kept the team aligned."
+  # DRAFT by Claude from "The problem" section below: rewrite freely
+  problem: "The studio's legacy system had become the answer to everything, from time off and who was on each show to finances. As the studio grew, each role kept its own picture of the plan, no one could trace what had changed or which scenarios were possible, and it all relied on a few people knowing how to handle it."
+  # Malin's insight, tightened by Claude: rewrite freely
+  insight: "Bidding wasn't the hard part; keeping everyone in sync was. Years of processes and workarounds had to keep working in the new system, and a visual planning tool sets a high bar for interaction, with many opinions to weigh and prioritize. With the scope shifting often, it was hard to know what level of quality to design for."
+  # Malin's design intent, tightened by Claude: rewrite freely
+  designIntent: "Break the big system into modules we could ship and validate with users one at a time: people and skills, bid import, then drafting and assigning key artists, building towards the studio's full planning. A living service blueprint and a shadcn-based design system kept the team aligned and let us focus on flows rather than component details."
   whatIDid: Collected the user research in a living service blueprint, designed the modules with the product manager and developers, and built a design system based on shadcn.
   result: Delivered a people and skills module, a bid import module, and drafting and assignment of key artists, replacing the manually updated spreadsheets. Set the overall direction of how the product would grow conceptually.
 links: []
@@ -63,9 +66,13 @@ We started out an iterative process, chucking the big system into pieces we coul
 
 ![Concept prototype of the people list: a recruitment chart above a table of artists with role, discipline, current show and who they report to.](./concept-people.webp "Concept prototype: people") ![Concept prototype of a show's crew on a timeline, grouped by discipline, with unassigned slots and requests.](./concept-crew.webp "Concept prototype: crew")
 
+![Concept prototype of all shows: each show as a card with its status, dates, potential revenue and crew days as progress bars, a sailing gauge from rough seas to smooth sailing, and its project margin against target. Revenue figures are masked.](./concept-shows.webp "Concept prototype: all shows")
+
 ## Result
 
 ![A dark timeline view of all crews, with shows as coloured bars, FX supervisor slots under each show, and a list of people below. Names are masked.](./all-crews.webp "All crews on one timeline") ![A show's crew on a timeline with a side panel for one Production Manager slot: its timespans, comments, the assigned person and matching artists. Names are masked.](./crew-detail.webp "A show's crew, with one slot open for assignment")
+
+*Unfortunately, I can’t show more of the live product, as its screens hold real financial, personal and planning data.*
 
 I had a strong impact on how the product took shape. Together with a team of 3–4 developers, we:
 
