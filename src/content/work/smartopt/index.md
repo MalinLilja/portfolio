@@ -24,7 +24,8 @@ tldr:
   # DRAFTS by Claude from the case text (brief, insight, designIntent): rewrite freely
   brief: "A fuel optimization app for the shipping industry, taken from pre-study to launch."
   problem: Ships are often ordered to sail at a speed and fuel use that is far from optimal, because no one can weigh all the factors that affect earnings.
-  insight: "The calculation already worked. The open question was whether shipping teams would use it, so the app had to fit their decisions about speed and fuel, not the method behind it."
+  # Malin's insight, edited by Claude: rewrite freely
+  insight: "Estimating is always hard, and it was harder without access to the end users, which slowed our progress. Later came a bigger insight: breaking into the shipping business with an app is a challenge in itself, because of the industry's bureaucracy."
   designIntent: "Start with a pre-study: interviews with expert users, a service blueprint pairing the user journey with the system behind it, and a concept checked with developers. Then a roadmap, a baseline design system and the main user flows."
   # Stakeholders tile in the summary bento: one per line, e.g. - Residual value analysts
   stakeholders: ["[stakeholders]"]

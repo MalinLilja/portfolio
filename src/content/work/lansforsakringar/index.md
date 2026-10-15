@@ -24,7 +24,8 @@ tldr:
   # DRAFTS by Claude from the case text (brief, insight, designIntent): rewrite freely
   brief: "Five tailored internal services that made a regional insurer's processes faster and more consistent, including a GDPR compliance tool."
   problem: Internal processes needed to be streamlined and aligned across teams.
-  insight: "Each service had to fit how its team actually worked, so every new feature started with users and developers finding out what was needed and what was technically feasible."
+  # From Malin's notes, written by Claude: rewrite freely
+  insight: "Every tool had to fit how the company really worked, team by team, and with many teams asking for features, regular user feedback decided what came first. Other Länsförsäkringar companies would use the services too, so I also designed and executed their onboarding."
   designIntent: "Tailored services with process design, wireframes and UI within Länsförsäkringar's brand guidelines. For Personuppgiftskollen, one record view that gathers personal data, legal grounds and a risk matrix in one place."
   # Stakeholders tile in the summary bento: one per line, e.g. - Residual value analysts
   stakeholders: ["[stakeholders]"]
