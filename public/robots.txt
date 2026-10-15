@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://malinlilja.se/sitemap-index.xml
+Sitemap: https://portfolio.lium.design/sitemap-index.xml

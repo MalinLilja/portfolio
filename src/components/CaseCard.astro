@@ -41,13 +41,17 @@ const timeline = hideGaps(item.timeline);
 const purpose = hideGaps(item.purpose);
 // On hover (and keyboard focus) the border takes the case colour and the card glows in it
 // The text part is frosted glass over the liquid background, which runs under the whole card
-const glass = 'relative border-border bg-surface/80 backdrop-blur-xl';
+// Cards waiting behind in the deck are inert and mostly covered, so they skip the blur (it's
+// redrawn every frame and is the costliest part of a card)
+const glass = 'relative border-border bg-surface/80 backdrop-blur-xl in-[[inert]]:backdrop-blur-none';
 const glow =
   'border-border transition-[border-color] duration-300 ease-out hover:border-case-accent focus-within:border-case-accent';
 // Behind the card: its own liquid background, blurred and drifting slowly, so the glow is
 // wispy like the hero. It fades in on hover and keyboard focus.
+// The blur is on the picture itself, which then only moves: the browser blurs it once and slides
+// the result, instead of redrawing the blur every frame.
 const wisp =
-  'pointer-events-none absolute -inset-16 -z-10 overflow-hidden rounded-[64px] opacity-0 blur-[32px] saturate-150 transition-opacity duration-500 ease-out [mask-image:radial-gradient(farthest-side,black_80%,transparent)] group-hover:opacity-100 group-focus-within:opacity-100';
+  'pointer-events-none absolute -inset-16 -z-10 overflow-hidden rounded-[64px] opacity-0 transition-opacity duration-500 ease-out [mask-image:radial-gradient(farthest-side,black_80%,transparent)] group-hover:opacity-100 group-focus-within:opacity-100';
 ---
 
 {
@@ -59,7 +63,7 @@ const wisp =
     >
       {item.href && (
         <div class={wisp} aria-hidden="true">
-          <Image src={item.background ?? gradient} alt="" widths={[640]} sizes="640px" loading="lazy" class="size-full! max-w-none! object-cover group-hover:motion-safe:animate-wisp" />
+          <Image src={item.background ?? gradient} alt="" widths={[640]} sizes="640px" loading="lazy" class="size-full! max-w-none! object-cover blur-[32px] saturate-150 will-change-transform group-hover:motion-safe:animate-wisp" />
         </div>
       )}
       {/* Only the background is clipped to the card, so the pictures can stick out of it */}
@@ -111,7 +115,7 @@ const wisp =
     >
       {item.href && (
         <div class={wisp} aria-hidden="true">
-          <Image src={item.background ?? gradient} alt="" widths={[640]} sizes="640px" loading="lazy" class="size-full! max-w-none! object-cover group-hover:motion-safe:animate-wisp" />
+          <Image src={item.background ?? gradient} alt="" widths={[640]} sizes="640px" loading="lazy" class="size-full! max-w-none! object-cover blur-[32px] saturate-150 will-change-transform group-hover:motion-safe:animate-wisp" />
         </div>
       )}
       {/* Only the background is clipped to the card, so the pictures can stick out of it */}

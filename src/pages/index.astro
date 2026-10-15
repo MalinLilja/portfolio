@@ -170,22 +170,40 @@ const work = [
     const EXIT_FROM = START + STEP * (lines.length - 1) + 0.2; // the intro starts moving away
     const EXIT_LENGTH = 0.2;
     let wipe = (window as unknown as { heroWipe?: number }).heroWipe ?? 0;
+    // Writing to the stage restyles everything inside it (the deck, the strips), so this runs at
+    // most once a frame and only touches the page when something actually changed
+    let lastShown = -1;
+    let lastExit = '';
+    let queued = false;
     const update = () => {
+      queued = false;
       const scrolled = -stage.getBoundingClientRect().top;
       const shown = wipe < 0.5 ? 0 : 1 + Math.max(0, Math.floor((scrolled - START * innerHeight) / (STEP * innerHeight) + 1));
-      lines.forEach((line, i) => line.classList.toggle('is-revealed', i < shown));
-      const exit = wipe < 0.5 ? 0 : Math.min(1, Math.max(0, (scrolled / innerHeight - EXIT_FROM) / EXIT_LENGTH));
-      stage.style.setProperty('--lead-exit', exit.toFixed(3));
-      stage.toggleAttribute('data-lead-done', exit >= 1);
-      (window as unknown as { heroLeadExit?: number }).heroLeadExit = exit;
-      window.dispatchEvent(new CustomEvent('hero-lead', { detail: exit }));
+      if (shown !== lastShown) {
+        lastShown = shown;
+        lines.forEach((line, i) => line.classList.toggle('is-revealed', i < shown));
+      }
+      const value = wipe < 0.5 ? 0 : Math.min(1, Math.max(0, (scrolled / innerHeight - EXIT_FROM) / EXIT_LENGTH));
+      const exit = value.toFixed(3);
+      if (exit === lastExit) return;
+      lastExit = exit;
+      stage.style.setProperty('--lead-exit', exit);
+      stage.toggleAttribute('data-lead-done', value >= 1);
+      (window as unknown as { heroLeadExit?: number }).heroLeadExit = value;
+      window.dispatchEvent(new CustomEvent('hero-lead', { detail: value }));
+    };
+    const schedule = () => {
+      if (!queued) {
+        queued = true;
+        requestAnimationFrame(update);
+      }
     };
     window.addEventListener('hero-wipe', (e) => {
       wipe = (e as CustomEvent<number>).detail;
-      update();
+      schedule();
     });
-    addEventListener('scroll', update, { passive: true });
-    addEventListener('resize', update);
+    addEventListener('scroll', schedule, { passive: true });
+    addEventListener('resize', schedule);
     update();
   }
 </script>

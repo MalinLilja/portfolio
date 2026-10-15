@@ -8,8 +8,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-  // TODO: replace with the real domain once it's chosen (open item in the spec).
-  site: 'https://malinlilja.se',
+  site: 'https://portfolio.lium.design',
 
   trailingSlash: 'never',
   build: { format: 'file' },

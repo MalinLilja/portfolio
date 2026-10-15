@@ -29,6 +29,10 @@
   if (stage && wipe && star && fill) {
     const photo = stage.querySelector<HTMLElement>('.hero-photo');
     const lead = stage.querySelector<HTMLElement>('[data-hero-lead]');
+    // The fades are set on the elements that use them, not the whole stage: a value on the stage
+    // restyles everything in it (the card deck too) on every frame of the transition
+    const heroText = stage.querySelector<HTMLElement>('.liquid-hero') ?? stage;
+    const introBox = lead ?? stage;
     // A little scroll starts the transition; scrolling back to the top plays it in reverse
     const TRIGGER_PX = 16;
     const DURATION_MS = 650;
@@ -47,8 +51,8 @@
       if (reduceMotion.matches) {
         star.style.transform = '';
         fill.style.opacity = '0';
-        stage.style.removeProperty('--wipe-text');
-        stage.style.removeProperty('--wipe-intro');
+        heroText.style.removeProperty('--wipe-text');
+        introBox.style.removeProperty('--wipe-intro');
         if (photo) photo.style.opacity = '';
         announce(1);
         return;
@@ -64,9 +68,9 @@
       const covered = Math.min(1, Math.max(0, (p - 0.85) / 0.12));
       fill.style.opacity = String(covered);
       // The hero text fades out as the dark comes in, then the intro's first paragraph fades in
-      stage.style.setProperty('--wipe-text', String(Math.min(1, Math.max(0, (p - 0.55) / 0.3))));
+      heroText.style.setProperty('--wipe-text', String(Math.min(1, Math.max(0, (p - 0.55) / 0.3))));
       const intro = Math.min(1, Math.max(0, (p - 0.85) / 0.15));
-      stage.style.setProperty('--wipe-intro', String(intro));
+      introBox.style.setProperty('--wipe-intro', String(intro));
       lead?.classList.toggle('is-shown', intro > 0.5);
       // The part of the photo that hangs below the hero isn't under the star, so fade it out
       if (photo) photo.style.opacity = String(1 - covered);
