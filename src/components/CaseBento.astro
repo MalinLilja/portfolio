@@ -1,7 +1,12 @@
 ---
-// Case study summary as a bento grid: the main picture as the biggest tile, then purpose,
-// company, role, timeline, what I did, team and stakeholders (one tile) and result. Replaces the old TL;DR box.
-// Tiles whose text is still a [gap] are left out, and the grid closes up around them.
+// Case study summary as a bento grid, laid out like a case study template:
+//   the brief (no heading)                 | picture   (the picture spans two rows on wide screens)
+//   time and role | team and stakeholders  | picture
+//   problem                                | insight
+//   design intent                          | outcome
+//   company (hidden for now: showCompany)
+// The brief falls back to the purpose, and the design intent to "What I did". Tiles whose text
+// is still a [gap] are left out, and the grid closes up around them.
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import BentoTile from './BentoTile.astro';
@@ -18,71 +23,52 @@ interface Props {
     timeline?: string;
     team?: string;
     stakeholders?: string[];
+    brief?: string;
+    problem: string;
+    insight?: string;
+    designIntent?: string;
     whatIDid: string;
     result?: string;
   };
 }
 
 const { hero, heroAlt, roles, tldr } = Astro.props;
-const purpose = hideGaps(Astro.props.purpose);
+const brief = hideGaps(tldr.brief) || hideGaps(Astro.props.purpose);
 const timeline = hideGaps(tldr.timeline);
+const problem = hideGaps(tldr.problem);
+const insight = hideGaps(tldr.insight);
+const designIntent = hideGaps(tldr.designIntent) || hideGaps(tldr.whatIDid);
+const result = hideGaps(tldr.result);
 const team = hideGaps(tldr.team);
 const stakeholders = hideGapItems(tldr.stakeholders);
-const whatIDid = hideGaps(tldr.whatIDid);
-const result = hideGaps(tldr.result);
+const hasTeam = Boolean(team || stakeholders.length > 0);
 // "Optimum Earnings, freight and shipping industry" → name + description
 const [companyName, ...rest] = hideGaps(tldr.company).split(', ');
 const companyAbout = rest.join(', ');
+const showCompany = false;
 // Never upscale: only widths up to the source image's own width
 const widths = [...[480, 720, 1080, 1440].filter((w) => w < hero.width), hero.width];
+// The same body text as the company description, a size up for the longer paragraphs
+const text = 'text-16 leading-body text-text-muted';
 ---
 
 <section class="grid grid-flow-row-dense grid-cols-1 gap-3 md:grid-cols-2 md:gap-4 lg:grid-cols-4" aria-label="Project summary">
-  <div class="overflow-hidden rounded-media border border-border bg-surface md:col-span-2 lg:row-span-3">
-    <Image
-      src={hero}
-      alt={heroAlt}
-      widths={widths}
-      sizes="(min-width: 1248px) 600px, (min-width: 720px) calc(100vw - 2 * var(--gutter)), 100vw"
-      loading="eager"
-      fetchpriority="high"
-      class="h-full! w-full! max-w-none! max-h-none cursor-zoom-in object-cover object-left-top"
-      data-zoomable
-    />
-  </div>
-
   {
-    purpose && (
-      <BentoTile label="Purpose" class="md:col-span-2">
-        <p class="font-headline text-22 leading-snug font-medium text-balance">{purpose}</p>
+    brief && (
+      <BentoTile class="md:col-span-2 lg:col-start-1 lg:row-start-1">
+        <p class="font-headline text-22 leading-snug font-medium text-balance">{brief}</p>
       </BentoTile>
     )
   }
 
-  <BentoTile label="Company" class:list={[!timeline && 'lg:col-span-2']}>
-    <p class="font-display text-17 font-heading">{companyName}</p>
-    {companyAbout && <p class="text-14 text-text-muted">{companyAbout}</p>}
-  </BentoTile>
-
-  {
-    timeline && (
-      <BentoTile label="Timeline">
-        <p class="font-display text-17 font-heading tabular-nums">{timeline}</p>
-      </BentoTile>
-    )
-  }
-
-  <BentoTile label="My role" class="md:col-span-2">
+  <BentoTile label={timeline ? 'Time and role' : 'My role'} class:list={['lg:col-start-1', brief ? 'lg:row-start-2' : 'lg:row-start-1', !hasTeam && 'md:col-span-2']}>
+    {timeline && <p class="font-display text-17 font-heading tabular-nums">{timeline}</p>}
     <RoleBadges roles={roles} />
   </BentoTile>
 
-  <BentoTile label="What I did" class:list={['md:col-span-2', !team && stakeholders.length === 0 && 'lg:col-span-4']}>
-    <p>{whatIDid}</p>
-  </BentoTile>
-
   {
-    (team || stakeholders.length > 0) && (
-      <BentoTile label={team && stakeholders.length > 0 ? 'Team and stakeholders' : team ? 'Team' : 'Stakeholders'} class="md:col-span-2">
+    hasTeam && (
+      <BentoTile label={team && stakeholders.length > 0 ? 'Team and stakeholders' : team ? 'Team' : 'Stakeholders'} class:list={['lg:col-start-2', brief ? 'lg:row-start-2' : 'lg:row-start-1']}>
         {team && <p>{team}</p>}
         {stakeholders.length > 0 && (
           <ul class:list={['flex flex-wrap gap-2', team && 'mt-2']} aria-label="Stakeholders">
@@ -95,11 +81,50 @@ const widths = [...[480, 720, 1080, 1440].filter((w) => w < hero.width), hero.wi
     )
   }
 
+  <div class="overflow-hidden rounded-media border border-border bg-surface md:col-span-2 lg:col-start-3 lg:row-span-2 lg:row-start-1">
+    <Image
+      src={hero}
+      alt={heroAlt}
+      widths={widths}
+      sizes="(min-width: 1248px) 600px, (min-width: 720px) calc(100vw - 2 * var(--gutter)), 100vw"
+      loading="eager"
+      fetchpriority="high"
+      class="h-full! w-full! max-w-none! max-h-none cursor-zoom-in object-cover object-left-top"
+      data-zoomable
+    />
+  </div>
+
+  <BentoTile label="Problem" class:list={['md:col-span-2', !insight && 'lg:col-span-4']}>
+    <p class={text}>{problem}</p>
+  </BentoTile>
+
   {
-    result && (
-      <BentoTile label="Result" class="md:col-span-2 lg:col-span-4">
-        <p class="font-headline text-18 leading-snug font-medium">{result}</p>
+    insight && (
+      // The key takeaway: a little more weight than the tiles around it
+      <BentoTile label="Insight" class="md:col-span-2">
+        <p class="font-headline text-18 leading-snug font-medium text-text">{insight}</p>
       </BentoTile>
     )
   }
+
+  <BentoTile label="Design intent" class:list={['md:col-span-2', !result && 'lg:col-span-4']}>
+    <p class={text}>{designIntent}</p>
+  </BentoTile>
+
+  {
+    result && (
+      <BentoTile label="Outcome" class="md:col-span-2">
+        <p class={text}>{result}</p>
+      </BentoTile>
+    )
+  }
+
+  {/* The company box is hidden for now; set to true to show it again */}
+  {showCompany && (
+  <BentoTile label="Company" class="md:col-span-2 lg:col-span-4">
+    <p class="font-display text-17 font-heading">{companyName}</p>
+    {companyAbout && <p class="text-14 text-text-muted">{companyAbout}</p>}
+  </BentoTile>
+  )}
+
 </section>

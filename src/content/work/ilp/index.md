@@ -30,7 +30,11 @@ tldr:
   # Stakeholders tile in the summary bento (from the slides)
   stakeholders: [Executive producers, Crewing managers, Talent managers, Producers]
   # problem, whatIDid and result: drafts by Claude from the slides, rewrite freely
+  # DRAFTS by Claude from the case text (brief, insight, designIntent): rewrite freely
+  brief: "A new planning platform for a 200+ person VFX studio, taken from the first research to a live product."
   problem: Bidding and crewing lived in a legacy system and separate spreadsheets, so no one could see what had changed or which scenarios were possible.
+  insight: "The bidding itself wasn't the problem; keeping everyone in sync was. Each role kept its own picture of the plan, so the platform had to become the one place to answer \"What's going on?\""
+  designIntent: "Break the big system into modules we could ship and validate with users one at a time: people and skills, bid import, then drafting and assigning key artists. A living service blueprint and a shadcn-based design system kept the team aligned."
   whatIDid: Collected the user research in a living service blueprint, designed the modules with the product manager and developers, and built a design system based on shadcn.
   result: Delivered a people and skills module, a bid import module, and drafting and assignment of key artists, replacing the manually updated spreadsheets. Set the overall direction of how the product would grow conceptually.
 links: []
@@ -50,12 +54,18 @@ The goal was to design a tool that people would actually use to connect the dots
 
 I collected the user research in a living "service blueprint" to help product management and the team understand the relationships and which priorities to set.
 
-![Two service blueprints: an early one with the planning process in swimlanes, and a fuller one with phases from day-to-day operations through bidding, assignments and the production plan.](./service-blueprint.webp "The living service blueprint")
+![Two service blueprints: an early one with the planning process in swimlanes, and a fuller one with phases from day-to-day operations through bidding, assignments and the production plan.](./service-blueprint.webp "The living service blueprint, with the yellow areas identifying what to build.")
 
 ## Process
 We started out an iterative process, chucking the big system into pieces we could ship and collaboratively validate with the users. I shared concepts with the team through live, and asyncronous, design feedback sessions, setting alignmet on what to build and why. Getting backend, frontend and product management to align on a scope and design. 
 
+![Concept prototype of crewing per discipline: each person's availability and booked days per day, with time off and the shows they're booked on.](./concept-crewing.webp "Concept prototype: crewing per discipline") ![Concept prototype of the forecast: a stacked chart of capacity per show over the coming weeks, above people needed and available per discipline.](./concept-forecast.webp "Concept prototype: forecast")
+
+![Concept prototype of the people list: a recruitment chart above a table of artists with role, discipline, current show and who they report to.](./concept-people.webp "Concept prototype: people") ![Concept prototype of a show's crew on a timeline, grouped by discipline, with unassigned slots and requests.](./concept-crew.webp "Concept prototype: crew")
+
 ## Result
+
+![A dark timeline view of all crews, with shows as coloured bars, FX supervisor slots under each show, and a list of people below. Names are masked.](./all-crews.webp "All crews on one timeline") ![A show's crew on a timeline with a side panel for one Production Manager slot: its timespans, comments, the assigned person and matching artists. Names are masked.](./crew-detail.webp "A show's crew, with one slot open for assignment")
 
 I had a strong impact on how the product took shape. Together with a team of 3–4 developers, we:
 
@@ -63,10 +73,6 @@ I had a strong impact on how the product took shape. Together with a team of 3�
 - Delivered the bid import module. The bidding process itself wasn't the problem; keeping everyone else in sync was
 - Made it possible for crewing to draft key artists on a daily, weekly and monthly basis, and to group and filter them flexibly to get a good overview of the plan and its options
 - Made it possible to assign these slots to people synced from the HR system, in a few clicks
-
-![Concept sketch of crewing per discipline: each person's availability and booked days per day, with time off and the shows they're booked on.](./concept-crewing.webp "Concept sketch: crewing per discipline") ![Concept sketch of the forecast: a stacked chart of capacity per show over the coming weeks, above people needed and available per discipline.](./concept-forecast.webp "Concept sketch: forecast")
-
-![Concept sketch of the people list: a recruitment chart above a table of artists with role, discipline, current show and who they report to.](./concept-people.webp "Concept sketch: people") ![Concept sketch of a show's crew on a timeline, grouped by discipline, with unassigned slots and requests.](./concept-crew.webp "Concept sketch: crew")
 
 …and a lot of supporting deliverables, such as:
 

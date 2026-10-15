@@ -21,11 +21,16 @@ tldr:
   company: Länsförsäkringar Göteborg och Bohuslän, a regional insurance company
   role: UX/UI designer and project manager, and product owner for Personuppgiftskollen
   timeline: 2023–2025
+  # DRAFTS by Claude from the case text (brief, insight, designIntent): rewrite freely
+  brief: "Five tailored internal services that made a regional insurer's processes faster and more consistent, including a GDPR compliance tool."
   problem: Internal processes needed to be streamlined and aligned across teams.
+  insight: "Each service had to fit how its team actually worked, so every new feature started with users and developers finding out what was needed and what was technically feasible."
+  designIntent: "Tailored services with process design, wireframes and UI within Länsförsäkringar's brand guidelines. For Personuppgiftskollen, one record view that gathers personal data, legal grounds and a risk matrix in one place."
   # Stakeholders tile in the summary bento: one per line, e.g. - Residual value analysts
   stakeholders: ["[stakeholders]"]
   whatIDid: Owned design and project management for 5 tailored internal services, from new ideas to ongoing development.
-  result: "[Add one outcome, e.g. time saved, processes digitised or number of internal users.]"
+  # DRAFT by Claude from the Outcome section (your placeholder was: "[Add one outcome, e.g. time saved, processes digitised or number of internal users.]")
+  result: "Five internal services designed and developed further over two years, and a GDPR tool that made compliance documentation easier for staff."
 ---
 
 ## Our role as an innovation partner

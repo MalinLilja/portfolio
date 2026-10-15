@@ -20,11 +20,16 @@ tldr:
   company: Qmatic, a global provider of customer journey and queue management solutions
   role: UX/UI Designer, and Agile Team Lead from 2022
   timeline: 2019–2023
+  # DRAFTS by Claude from the case text (brief, insight, designIntent): rewrite freely
+  brief: "A cloud appointment platform built for public and private sector clients, with a white-label booking flow for the public and tools for staff."
   problem: Qmatic needed a new cloud platform for appointments, which had to work for very different clients, both public and private sector.
+  insight: "The platform served two very different users: the public, booking an appointment under each client's brand, and staff, configuring and running the service. Each side needed its own experience."
+  designIntent: "A simple, accessible white-label booking flow that each client could brand as their own, powerful configuration for staff, and a shared design system that kept both consistent and WCAG compliant."
   # Stakeholders tile in the summary bento: one per line, e.g. - Residual value analysts
   stakeholders: ["[stakeholders]"]
   whatIDid: Researched, prototyped and designed both the customer-facing booking and the staff tools, owned the design system backlog and introduced Lean UX to the development team.
-  result: "[Add launch scope or adoption, e.g. number of customers or markets.]"
+  # DRAFT by Claude from the Outcome section (your placeholder was: "[Add launch scope or adoption, e.g. number of customers or markets.]")
+  result: "A shared design system that kept a white-label product consistent and accessible, and a development team working in shorter design and feedback loops."
 links:
   # Add the URLs to show these links.
   - label: Qmatic Experience Cloud

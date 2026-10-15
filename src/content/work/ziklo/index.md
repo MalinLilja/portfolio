@@ -21,7 +21,11 @@ tldr:
   company: Ziklo, The Mobility Bank, a car financing and leasing bank
   role: Product designer
   timeline: "2025"
+  # DRAFTS by Claude from the case text (brief, insight, designIntent): rewrite freely
+  brief: "A residual value tool for a car financing bank, reworked around how its analysts actually value cars."
   problem: Ziklo had built a tool for setting cars' residual values, but it didn't match how the team actually worked, and it hadn't been adopted.
+  insight: "The tool didn't follow the team's own workflow: analysis, the residual value council and decision, and activation. Adoption depended on matching that process, not on adding features."
+  designIntent: "Rebuild the tool around a project board that moves each car model through those stages, and a visual scorecard that explains the model behind each suggested residual value."
   # Stakeholders tile in the summary bento: one per line, e.g. - Residual value analysts
   team: Only designer with 2-3 developers
   stakeholders: [Residual value analysts, Credit council, Product manager]
