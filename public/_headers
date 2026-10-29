@@ -1,0 +1,5 @@
+# Cloudflare serves these headers with the static files (dist/).
+# Files in /_astro/ get a new name whenever their content changes, so browsers can keep them
+# for a year instead of checking each one again on every visit.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

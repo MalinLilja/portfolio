@@ -46,7 +46,7 @@ const control =
     {
       items.map((item, i) => (
         <li class="deck-card absolute inset-0 origin-top-left will-change-transform" data-deck-card data-client={item.client} inert>
-          <CaseCard item={item} compact eager={i < 2} />
+          <CaseCard item={item} compact eager={i === 0} />
           {/* Halftone screen and shade for cards further back */}
           <span
             class="deck-halftone pointer-events-none absolute inset-0 rounded-media bg-[radial-gradient(circle,var(--color-bg)_1.1px,transparent_1.7px)] bg-size-[5px_5px] opacity-0"

@@ -13,9 +13,11 @@ const { items } = Astro.props;
 
 <ol class="grid gap-16 md:gap-20">
   {
-    items.map((item, i) => (
+    // No eager pictures: on wide screens this list is hidden (the deck shows instead), and eager
+    // pictures would still download there; on phones the list starts below the first screen
+    items.map((item) => (
       <li>
-        <CaseCard item={item} eager={i === 0} />
+        <CaseCard item={item} />
       </li>
     ))
   }
