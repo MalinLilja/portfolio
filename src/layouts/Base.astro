@@ -57,7 +57,9 @@ const ogUrl = new URL(og.src, Astro.site);
       href="#main">Skip to content</a
     >
     <Header />
-    <main id="main" tabindex="-1" class="focus:outline-none">
+    {/* Clips anything that pokes out sideways (the case cards' hover glow near the screen edge)
+        without becoming a scroll container, so sticky parts still work */}
+    <main id="main" tabindex="-1" class="overflow-x-clip focus:outline-none">
       <slot />
     </main>
     <Footer />

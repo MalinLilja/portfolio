@@ -6,7 +6,6 @@ import HeroPhoto from '../components/HeroPhoto.astro';
 import HeroStarWipe from '../components/HeroStarWipe.astro';
 import PositioningLine from '../components/PositioningLine.astro';
 import CaseCards from '../components/CaseCards.astro';
-import CaseDeck from '../components/CaseDeck.astro';
 import CompanyStrip from '../components/CompanyStrip.astro';
 import Practice from '../components/Practice.astro';
 import ConnectTheDots from '../components/ConnectTheDots.astro';
@@ -60,10 +59,10 @@ const work = [
        corner grow until the hero is dark, while the hero stays pinned briefly (see HeroStarWipe).
        The hero text fades out and the dark screen shows the intro's first paragraph on its own,
        one sentence at a time as you scroll. Scrolling on, the intro moves away (--lead-exit,
-       0 → 1) and, on wide screens, the case card deck (CaseDeck) comes in.
+       0 → 1) as the page scrolls on to the work grid below.
        The photo overlaps the hero's bottom edge, so it sits outside the hero's clipping. -->
   <div
-    class="relative overflow-x-clip js:motion-safe:h-[calc(100svh-var(--header-height)+var(--wipe-travel)+var(--lead-travel))] [--wipe-travel:30svh] [--lead-travel:65svh] lg:[--lead-travel:115svh]"
+    class="relative overflow-x-clip js:motion-safe:h-[calc(100svh-var(--header-height)+var(--wipe-travel)+var(--lead-travel))] [--wipe-travel:30svh] [--lead-travel:65svh]"
     data-hero-stage
   >
     <div class="relative js:motion-safe:sticky js:motion-safe:top-(--header-height)">
@@ -98,24 +97,18 @@ const work = [
         </div>
       </div>
     </div>
-    <CaseDeck items={work}>
-      <CompanyStrip slot="above" items={home.data.companies} id="deck-companies" class="w-full" />
-    </CaseDeck>
     </div>
   </div>
 
   <div class="container-page">
     {home.data.journey && !home.data.journey.hidden && <ConnectTheDots {...home.data.journey} />}
 
-    <section id="work" class="pt-[clamp(48px,10vh,120px)] lg:js:motion-safe:pt-0" aria-labelledby="work-heading">
+    <section id="work" class="pt-[clamp(48px,10vh,120px)]" aria-labelledby="work-heading">
       {/* Not shown, but names the cases for screen readers */}
       <h2 id="work-heading" class="sr-only">Selected work</h2>
-      {/* On wide screens with motion the cases are the deck on the dark hero instead */}
-      <div class="lg:js:motion-safe:hidden">
-        {/* Companies I've worked with, above the cases (on wide screens it sits above the deck) */}
-        <CompanyStrip items={home.data.companies} class="-mx-(--gutter) mb-14 md:mb-20" />
-        <CaseCards items={work} />
-      </div>
+      {/* Companies I've worked with, above the cases */}
+      <CompanyStrip items={home.data.companies} class="-mx-(--gutter) mb-14 md:mb-20" />
+      <CaseCards items={work} />
     </section>
 
     {
@@ -158,9 +151,8 @@ const work = [
 <script>
   // The intro on the dark hero: after the star has covered the hero, each further stretch of
   // scrolling reveals the next sentence (scrolling back up hides them again). Then the intro
-  // moves away and the card deck comes in (--lead-exit on the stage, 0 → 1, also sent as the
-  // `hero-lead` event). Once the deck is fully in, the stage gets data-lead-done and the deck
-  // takes over the mouse wheel. The hero stage stays pinned for all this (--lead-travel).
+  // moves up and away (--lead-exit on the stage, 0 → 1, also sent as the `hero-lead` event) as
+  // the page scrolls on to the work grid. The hero stage stays pinned for this (--lead-travel).
   const stage = document.querySelector<HTMLElement>('[data-hero-stage]');
   const lines = [...document.querySelectorAll<HTMLElement>('[data-lead-line]')];
   if (stage && lines.length) {
@@ -170,7 +162,7 @@ const work = [
     const EXIT_FROM = START + STEP * (lines.length - 1) + 0.2; // the intro starts moving away
     const EXIT_LENGTH = 0.2;
     let wipe = (window as unknown as { heroWipe?: number }).heroWipe ?? 0;
-    // Writing to the stage restyles everything inside it (the deck, the strips), so this runs at
+    // Writing to the stage restyles everything inside it, so this runs at
     // most once a frame and only touches the page when something actually changed
     let lastShown = -1;
     let lastExit = '';

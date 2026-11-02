@@ -1,7 +1,7 @@
 ---
-// Selected work as clear, focused cards, one per case, stacked (see CaseCard). This is the
-// version for phones, tablets, reduced motion and no JavaScript; on wide screens with
-// motion the cases are shown as the card deck on the dark hero instead (CaseDeck).
+// Selected work as a grid of case cards (see CaseCard): one column on phones, two from
+// tablets up. Each card has a fixed height, so the pictures over the liquid background get
+// the same room in every card, and the rows line up.
 import CaseCard, { type CaseItem } from './CaseCard.astro';
 
 interface Props {
@@ -11,13 +11,12 @@ interface Props {
 const { items } = Astro.props;
 ---
 
-<ol class="grid gap-16 md:gap-20">
+<ol class="grid gap-8 md:grid-cols-2">
   {
-    // No eager pictures: on wide screens this list is hidden (the deck shows instead), and eager
-    // pictures would still download there; on phones the list starts below the first screen
+    // No eager pictures: the grid starts below the first screen
     items.map((item) => (
-      <li>
-        <CaseCard item={item} />
+      <li class="h-[34rem]">
+        <CaseCard item={item} compact />
       </li>
     ))
   }
