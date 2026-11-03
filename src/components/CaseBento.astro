@@ -1,9 +1,10 @@
 ---
 // Case study summary as a bento grid, laid out like a case study template:
 //   the brief (no heading)                 | picture   (the picture spans two rows on wide screens)
-//   time and role | team and stakeholders  | picture
-//   problem                                | insight
-//   design intent                          | outcome
+//   time and role | team                   | picture
+//   problem                                | design intent
+//   outcome
+// (The insight is shown at the end of the case page instead.)
 //   company (hidden for now: showCompany)
 // The brief falls back to the purpose, and the design intent to "What I did". Tiles whose text
 // is still a [gap] are left out, and the grid closes up around them.
@@ -11,7 +12,7 @@ import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import BentoTile from './BentoTile.astro';
 import RoleBadges from './RoleBadges.astro';
-import { hideGaps, hideGapItems } from '../lib/brackets';
+import { hideGaps } from '../lib/brackets';
 
 interface Props {
   hero: ImageMetadata;
@@ -25,7 +26,6 @@ interface Props {
     stakeholders?: string[];
     brief?: string;
     problem: string;
-    insight?: string;
     designIntent?: string;
     whatIDid: string;
     result?: string;
@@ -36,12 +36,9 @@ const { hero, heroAlt, roles, tldr } = Astro.props;
 const brief = hideGaps(tldr.brief) || hideGaps(Astro.props.purpose);
 const timeline = hideGaps(tldr.timeline);
 const problem = hideGaps(tldr.problem);
-const insight = hideGaps(tldr.insight);
 const designIntent = hideGaps(tldr.designIntent) || hideGaps(tldr.whatIDid);
 const result = hideGaps(tldr.result);
 const team = hideGaps(tldr.team);
-const stakeholders = hideGapItems(tldr.stakeholders);
-const hasTeam = Boolean(team || stakeholders.length > 0);
 // "Optimum Earnings, freight and shipping industry" → name + description
 const [companyName, ...rest] = hideGaps(tldr.company).split(', ');
 const companyAbout = rest.join(', ');
@@ -61,22 +58,15 @@ const text = 'text-16 leading-body text-text-muted';
     )
   }
 
-  <BentoTile label={timeline ? 'Time and role' : 'My role'} class:list={['lg:col-start-1', brief ? 'lg:row-start-2' : 'lg:row-start-1', !hasTeam && 'md:col-span-2']}>
+  <BentoTile label={timeline ? 'Time and role' : 'My role'} class:list={['lg:col-start-1', brief ? 'lg:row-start-2' : 'lg:row-start-1', !team && 'md:col-span-2']}>
     {timeline && <p class="font-display text-17 font-heading tabular-nums">{timeline}</p>}
     <RoleBadges roles={roles} />
   </BentoTile>
 
   {
-    hasTeam && (
-      <BentoTile label={team && stakeholders.length > 0 ? 'Team and stakeholders' : team ? 'Team' : 'Stakeholders'} class:list={['lg:col-start-2', brief ? 'lg:row-start-2' : 'lg:row-start-1']}>
-        {team && <p>{team}</p>}
-        {stakeholders.length > 0 && (
-          <ul class:list={['flex flex-wrap gap-2', team && 'mt-2']} aria-label="Stakeholders">
-            {stakeholders.map((s) => (
-              <li class="rounded-pill border border-border px-3 py-1 text-13 text-text">{s}</li>
-            ))}
-          </ul>
-        )}
+    team && (
+      <BentoTile label="Team" class:list={['lg:col-start-2', brief ? 'lg:row-start-2' : 'lg:row-start-1']}>
+        <p>{team}</p>
       </BentoTile>
     )
   }
@@ -94,26 +84,17 @@ const text = 'text-16 leading-body text-text-muted';
     />
   </div>
 
-  <BentoTile label="Problem" class:list={['md:col-span-2', !insight && 'lg:col-span-4']}>
+  <BentoTile label="Problem" class="md:col-span-2">
     <p class={text}>{problem}</p>
   </BentoTile>
 
-  {
-    insight && (
-      // The key takeaway: a little more weight than the tiles around it
-      <BentoTile label="Insight" class="md:col-span-2">
-        <p class="font-headline text-18 leading-snug font-medium text-text">{insight}</p>
-      </BentoTile>
-    )
-  }
-
-  <BentoTile label="Design intent" class:list={['md:col-span-2', !result && 'lg:col-span-4']}>
+  <BentoTile label="Design intent" class="md:col-span-2">
     <p class={text}>{designIntent}</p>
   </BentoTile>
 
   {
     result && (
-      <BentoTile label="Outcome" class="md:col-span-2">
+      <BentoTile label="Outcome" class="md:col-span-2 lg:col-span-4">
         <p class={text}>{result}</p>
       </BentoTile>
     )

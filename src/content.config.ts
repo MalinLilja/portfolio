@@ -43,11 +43,11 @@ const work = defineCollection({
         role: z.string(),
         timeline: z.string().optional(),
         team: z.string().optional(),
-        // Who Malin worked with and for, shown as a list in the summary bento
+        // Who Malin worked with and for (kept in the content, not shown in the summary bento)
         stakeholders: z.array(z.string()).default([]),
-        // The summary bento follows a case study template: brief, problem, insight, design
-        // intent and outcome (result). Without a brief it shows the purpose; without a design
-        // intent, "What I did".
+        // The summary bento follows a case study template: brief, problem, design intent and
+        // outcome (result); the insight closes the case page. Without a brief the bento shows
+        // the purpose; without a design intent, "What I did".
         brief: z.string().optional(),
         problem: z.string(),
         insight: z.string().optional(),

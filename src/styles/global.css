@@ -126,6 +126,11 @@
     & .image-pair {
       @apply grid gap-6 md:grid-cols-[repeat(auto-fit,minmax(0,1fr))];
 
+      /* Three or more pictures (a gallery, like concept prototypes): smaller, three per row */
+      &:has(> :nth-child(3)) {
+        @apply md:grid-cols-2 lg:grid-cols-3;
+      }
+
       & .figure {
         margin: 0;
       }

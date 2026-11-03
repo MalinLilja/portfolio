@@ -21,6 +21,7 @@ const { data } = entry;
 const { Content } = await render(entry);
 const links = data.links.filter((l) => l.url);
 const timeline = hideGaps(data.tldr.timeline);
+const insight = hideGaps(data.tldr.insight);
 ---
 
 <Base
@@ -69,6 +70,15 @@ const timeline = hideGaps(data.tldr.timeline);
     <div class="container-page">
       <div class="prose mx-auto pt-4 [&>h2:first-child]:mt-12">
         <Content />
+        {/* What the project taught, to close the case (tldr.insight) */}
+        {
+          insight && (
+            <>
+              <h2>Insight</h2>
+              <p>{insight}</p>
+            </>
+          )
+        }
       </div>
     </div>
 
